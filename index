@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#EDEFE6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="Wedding reception of Kanesh & Anusha — Saturday 5 December 2026, 7:30 PM, Dewan MPT Kamunting, Perak.">
+<title>Kanesh &amp; Anusha — Reception Dinner</title>
+
+<!-- =====================================================================
+     SIMPLE  ·  reception invitation
+     No illustrations. Type, hairlines, and whatever photographs you add.
+
+     Optional files, in the same folder as this one:
+       cover.jpg      full-screen photograph behind the opening screen
+       couple.jpg     portrait in the invitation section
+       photo1.jpg … photo8.jpg   gallery
+       music.mp3      background music
+       duitnow-groom.png / duitnow-bride.png   DuitNow QR codes
+     Anything you leave out simply disappears. Nothing breaks.
+     ===================================================================== -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Karla:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --paper:#EDEFE6;
+  --card:#F7F8F2;
+  --ink:#1B291F;
+  --ink-2:#3F4E44;
+  --ink-3:#6E7C71;
+  --leaf:#2E5140;
+  --brass:#7C5C1E;
+  --rule:rgba(27,41,31,.15);
+  --serif:'Fraunces',ui-serif,Georgia,serif;
+  --sans:'Karla',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --ease:cubic-bezier(.22,.68,0,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);font-size:16.5px;line-height:1.62;color:var(--ink);
+  background:var(--paper);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.shut{overflow:hidden;height:100dvh}
+a{color:inherit}
+img{max-width:100%;display:block}
+
+/* ── cover ── */
+#cover{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;background:var(--paper);
+  padding:calc(56px + env(safe-area-inset-top)) 28px calc(48px + env(safe-area-inset-bottom));
+  transition:opacity .9s ease,transform 1s var(--ease)}
+#cover.open{opacity:0;transform:translateY(-24px);pointer-events:none}
+#cover .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.28}
+#cover .in{position:relative;z-index:1}
+.overline{font-size:11px;letter-spacing:.32em;color:var(--brass);text-indent:.32em}
+.cover-names{font-family:var(--serif);font-weight:400;font-size:clamp(40px,13vw,62px);
+  line-height:1.04;letter-spacing:-.02em;margin-top:24px}
+.cover-names i{display:block;font-style:italic;font-size:.36em;color:var(--brass);margin:10px 0;letter-spacing:0}
+.cover-sub{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--ink-2);margin-top:22px}
+.cover-date{font-size:11.5px;letter-spacing:.24em;color:var(--ink-3);margin-top:12px;text-indent:.24em}
+.openBtn{position:absolute;left:50%;bottom:calc(54px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  z-index:2;background:none;border:none;font:inherit;font-size:11px;letter-spacing:.28em;text-indent:.28em;
+  color:var(--ink);cursor:pointer;padding:10px 4px;border-bottom:1px solid var(--ink)}
+
+/* ── illustrated cover (cover.png) ── */
+#cover.art{padding:0;background:#0E1410}
+#cover.art .in{display:none}
+.art-blur{position:absolute;inset:-5%;background-size:cover;background-position:center;
+  filter:blur(40px) brightness(.9);transform:scale(1.1);opacity:0;transition:opacity .9s ease}
+#cover.art .art-blur{opacity:1}
+.art-wrap{position:absolute;inset:0;display:none;transform-origin:50% 34%;
+  transition:transform 1.5s cubic-bezier(.5,0,.3,1),opacity 1s ease .3s,filter 1.3s ease}
+#cover.art .art-wrap{display:block}
+.art-wrap img{width:100%;height:100%;object-fit:contain;
+  animation:breathe 16s ease-in-out infinite alternate}
+@keyframes breathe{from{transform:scale(1)}to{transform:scale(1.04)}}
+.art-veil{position:absolute;inset:0;display:none;pointer-events:none;
+  background:linear-gradient(0deg,rgba(22,14,30,.55),rgba(22,14,30,.12) 22%,transparent 38%)}
+#cover.art .art-veil{display:block}
+.bloom{position:absolute;left:50%;top:34%;width:42vmax;height:42vmax;border-radius:50%;
+  transform:translate(-50%,-50%) scale(0);opacity:0;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,251,238,.95),rgba(255,238,196,.55) 40%,rgba(255,232,180,0) 70%)}
+.fly{position:absolute;border-radius:50%;pointer-events:none;opacity:0;
+  background:radial-gradient(circle,#FFF7D4,rgba(255,214,120,.35) 55%,transparent 72%);
+  animation:fly linear infinite}
+@keyframes fly{0%{opacity:0;transform:translate(0,0) scale(.7)}
+  18%{opacity:.95}70%{opacity:.55}
+  100%{opacity:0;transform:translate(var(--dx),-62vh) scale(1.15)}}
+
+/* stepping into the light: the frame pushes past them, nothing is cut */
+#cover.into .art-wrap{transform:scale(1.6);opacity:0;filter:blur(7px) brightness(1.4)}
+#cover.into .art-veil{opacity:0;transition:opacity .5s ease}
+#cover.into .bloom{animation:bloom 1.5s ease-out forwards}
+#cover.into .openBtn{opacity:0;transition:opacity .3s ease}
+@keyframes bloom{0%{opacity:0;transform:translate(-50%,-50%) scale(0)}
+  28%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(6.5)}}
+
+#cover.art .openBtn{color:#2A1B33;border-bottom:none;border-radius:999px;
+  background:rgba(255,252,244,.94);padding:15px 34px;min-height:50px;
+  box-shadow:0 12px 34px rgba(0,0,0,.4);animation:hover 2.8s ease-in-out infinite}
+@keyframes hover{0%,100%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-50%) translateY(-6px)}}
+
+/* ── page ── */
+main{max-width:440px;margin:0 auto;padding:0 20px calc(90px + env(safe-area-inset-bottom))}
+section{padding:46px 0}
+section + section,.foot{border-top:1px solid var(--rule)}
+
+.label{font-size:11.5px;font-weight:500;letter-spacing:.2em;color:var(--brass);text-indent:.28em;text-align:center}
+h2{font-family:var(--serif);font-weight:500;font-size:25px;line-height:1.3;text-align:center;margin-top:12px}
+h2 em{font-style:italic}
+.lede{font-size:15px;line-height:1.72;color:var(--ink-2);text-align:center;margin:16px auto 0;max-width:33ch}
+.rule{width:44px;height:1px;background:var(--brass);opacity:.6;margin:22px auto 0}
+
+/* hosts */
+.portrait{width:min(70%,240px);margin:30px auto 0;aspect-ratio:3/4;overflow:hidden}
+.portrait img{width:100%;height:100%;object-fit:cover}
+.hosts{display:grid;grid-template-columns:1fr 1px 1fr;gap:16px;margin-top:30px}
+.host{text-align:center}
+.host .rel{font-size:9.5px;letter-spacing:.2em;color:var(--ink-3);text-indent:.2em}
+.host .nm{font-size:15px;line-height:1.55;margin-top:8px}
+.host .pl{font-size:13px;color:var(--ink-3);font-style:italic;margin-top:5px}
+.vline{background:var(--rule)}
+.couple{margin-top:34px;text-align:center}
+.couple .who{font-family:var(--serif);font-weight:500;font-size:30px;line-height:1.15}
+.couple .role{font-size:9.5px;letter-spacing:.22em;color:var(--brass);margin-top:5px;text-indent:.22em}
+.couple .amp{font-family:var(--serif);font-style:italic;font-size:23px;color:var(--brass);margin:14px 0}
+
+/* date plate */
+.plate{margin-top:26px;border:1px solid var(--rule);background:var(--card);padding:30px 20px;text-align:center}
+.plate .hr{font-family:var(--serif);font-weight:500;font-size:48px;line-height:1;font-variant-numeric:tabular-nums}
+.plate .hr sup{font-family:var(--sans);font-size:13px;letter-spacing:.14em;vertical-align:.95em;margin-left:6px;color:var(--ink-3)}
+.dstack{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;margin-top:24px}
+.dstack .side{font-size:10.5px;letter-spacing:.18em;color:var(--ink-2);text-indent:.18em}
+.dstack .day{font-family:var(--serif);font-weight:500;font-size:44px;line-height:1;padding:0 6px;
+  border-left:1px solid var(--rule);border-right:1px solid var(--rule)}
+.plate .yr{font-size:11.5px;letter-spacing:.32em;color:var(--ink-3);margin-top:18px;text-indent:.32em}
+.plate .at{font-size:14px;color:var(--ink-2);margin-top:18px;line-height:1.6}
+
+/* countdown */
+.count{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:22px;
+  background:var(--rule);border:1px solid var(--rule)}
+.count .u{background:var(--card);padding:16px 4px 13px;text-align:center}
+.count b{display:block;font-family:var(--serif);font-weight:500;font-size:25px;line-height:1;font-variant-numeric:tabular-nums}
+.count span{display:block;font-size:9px;letter-spacing:.16em;color:var(--ink-3);margin-top:8px}
+
+/* calendar */
+.cal{margin-top:22px;border:1px solid var(--rule);background:var(--card);padding:18px 14px}
+.cal .mo{font-family:var(--serif);font-size:18px;text-align:center;margin-bottom:14px}
+.cal table{width:100%;border-collapse:collapse;table-layout:fixed}
+.cal th{font-size:9.5px;letter-spacing:.1em;color:var(--ink-3);font-weight:400;padding-bottom:8px}
+.cal td{text-align:center;font-size:13.5px;color:var(--ink-2);padding:6px 0;font-variant-numeric:tabular-nums;position:relative}
+.cal td.on{color:var(--card)}
+.cal td.on::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:29px;height:29px;border-radius:50%;background:var(--leaf)}
+.cal td.on span{position:relative}
+
+/* buttons */
+.acts{display:flex;flex-direction:column;gap:9px;margin-top:24px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.btn{display:flex;align-items:center;justify-content:center;min-height:52px;padding:14px 16px;
+  border:1px solid var(--ink);background:none;cursor:pointer;text-decoration:none;text-align:center;
+  font:inherit;font-size:11px;letter-spacing:.2em;color:var(--ink);text-indent:.2em;
+  transition:background .2s ease,color .2s ease,transform .18s var(--ease)}
+.btn:active{transform:scale(.985)}
+.btn.solid{background:var(--ink);color:var(--paper)}
+.btn.quiet{border-color:var(--rule);color:var(--ink-2)}
+
+/* gallery */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:26px}
+.grid figure{position:relative;aspect-ratio:1;overflow:hidden;cursor:pointer;background:#E2E7D7}
+.grid img{width:100%;height:100%;object-fit:cover}
+.grid .more{position:absolute;inset:0;display:grid;place-items:center;
+  background:rgba(27,41,31,.55);color:#F7F8F2;font-family:var(--serif);font-size:25px}
+
+/* address */
+.addr{text-align:center;margin-top:22px}
+.addr .v{font-family:var(--serif);font-weight:500;font-size:21px;line-height:1.3}
+.addr .a{font-size:14.5px;color:var(--ink-2);margin-top:10px;line-height:1.7}
+.addr .p{font-size:13px;color:var(--ink-3);margin-top:12px;font-style:italic}
+
+/* dress */
+.dress{text-align:center;margin-top:20px}
+.dress .big{font-family:var(--serif);font-style:italic;font-size:27px}
+
+/* schedule */
+.plan{margin-top:24px;border-top:1px solid var(--rule)}
+.mark{display:grid;grid-template-columns:64px 1fr;gap:14px;padding:16px 0;border-bottom:1px solid var(--rule)}
+.mark .tm{font-size:12.5px;color:var(--brass);font-variant-numeric:tabular-nums;padding-top:4px}
+.mark .h{font-family:var(--serif);font-size:19px;line-height:1.3}
+.mark .d{font-size:13.5px;color:var(--ink-3);margin-top:3px}
+
+/* form */
+.form{margin-top:24px}
+.f{margin-bottom:16px}
+.f > label,.f .lab{display:block;font-size:9.5px;letter-spacing:.2em;color:var(--brass);margin-bottom:9px;text-indent:.2em}
+input[type=text],textarea,select{width:100%;font-family:var(--sans);font-size:16px;color:var(--ink);
+  background:var(--card);border:1px solid var(--rule);border-radius:0;padding:14px;min-height:52px;outline:none;
+  transition:border-color .2s}
+textarea{min-height:94px;resize:vertical;line-height:1.6}
+input::placeholder,textarea::placeholder{color:#A8B2A8}
+input:focus,textarea:focus,select:focus{border-color:var(--leaf)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opts.three{grid-template-columns:repeat(3,1fr)}
+.opt{position:relative;display:flex}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt span{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;min-height:50px;
+  padding:10px 8px;font-size:13.5px;line-height:1.3;border:1px solid var(--rule);background:var(--card);
+  color:var(--ink-2);cursor:pointer;transition:all .2s ease}
+.opt input:checked + span{background:var(--leaf);border-color:var(--leaf);color:#F2F5EC}
+.opt input:focus-visible + span{outline:2px solid var(--brass);outline-offset:2px}
+.note{font-size:12.5px;color:var(--ink-3);text-align:center;margin-top:14px;line-height:1.55}
+.note b{color:var(--brass);font-weight:500}
+.thanks{text-align:center;padding:14px 0}
+.thanks .gv{font-family:var(--serif);font-style:italic;font-size:29px}
+.thanks p{font-size:14px;color:var(--ink-2);margin-top:10px}
+.link{display:block;margin:16px auto 0;background:none;border:none;font:inherit;font-size:10.5px;
+  letter-spacing:.2em;color:var(--brass);cursor:pointer;text-indent:.2em;
+  border-bottom:1px solid var(--brass);padding-bottom:3px;width:fit-content}
+
+/* guestbook */
+.wishes{margin-top:22px}
+.wish{border:1px solid var(--rule);background:var(--card);padding:16px;margin-bottom:9px}
+.wish .who{font-size:10.5px;font-weight:500;letter-spacing:.16em;color:var(--brass);text-indent:.2em}
+.wish .msg{font-family:var(--serif);font-style:italic;font-size:16.5px;line-height:1.6;margin-top:8px}
+.empty{text-align:center;font-size:14px;color:var(--ink-3);font-style:italic;padding:14px 0}
+#wishBox.open{max-height:50dvh;overflow-y:auto;overscroll-behavior:contain;padding-right:4px}
+
+/* gift */
+.gifts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:24px}
+.gcard{border:1px solid var(--rule);background:var(--card);padding:22px 12px;text-align:center;
+  cursor:pointer;font:inherit;color:var(--ink);transition:transform .18s var(--ease)}
+.gcard:active{transform:scale(.97)}
+.gcard .rl{font-size:9.5px;letter-spacing:.2em;color:var(--ink-3);display:block;text-indent:.2em}
+.gcard .nm{font-family:var(--serif);font-weight:500;font-size:22px;display:block;margin-top:4px}
+.gcard .go{font-size:10px;letter-spacing:.18em;color:var(--brass);display:block;margin-top:12px;text-indent:.18em}
+
+/* modal */
+.veil{position:fixed;inset:0;z-index:150;display:none;align-items:center;justify-content:center;padding:20px;
+  background:rgba(27,41,31,.74)}
+.veil.on{display:flex}
+.modal{width:100%;max-width:320px;max-height:88dvh;overflow-y:auto;text-align:center;position:relative;
+  background:var(--card);border:1px solid var(--rule);padding:30px 22px 24px}
+.modal .x{position:absolute;top:8px;right:8px;width:36px;height:36px;border:none;background:none;
+  color:var(--ink-3);font-size:18px;cursor:pointer;line-height:1}
+.modal .rl{font-size:9.5px;letter-spacing:.22em;color:var(--ink-3);text-indent:.22em}
+.modal .nm{font-family:var(--serif);font-weight:500;font-size:26px;margin-top:2px}
+.qrbox{width:100%;max-width:220px;aspect-ratio:1;margin:18px auto 14px;background:#fff;
+  border:1px solid var(--rule);display:grid;place-items:center;overflow:hidden}
+.qrbox img{width:100%;height:100%;object-fit:contain;padding:8px}
+.qrbox .soon{font-size:13px;color:var(--ink-3);font-style:italic;padding:22px;line-height:1.55}
+.modal .bk{font-size:9.5px;letter-spacing:.2em;color:var(--brass);text-indent:.2em}
+.modal .ac{font-size:17px;letter-spacing:.06em;margin-top:4px;font-variant-numeric:tabular-nums}
+.modal .tip{font-size:12.5px;color:var(--ink-3);margin-top:14px;line-height:1.55}
+.mbtn{display:none;align-items:center;justify-content:center;width:100%;min-height:48px;margin-top:12px;
+  border:1px solid var(--rule);text-decoration:none;font-size:10.5px;letter-spacing:.18em;
+  color:var(--ink-2);text-indent:.18em}
+.mbtn.show,.mbtn.always{display:flex}
+
+/* lightbox */
+.lbx{position:fixed;inset:0;z-index:160;display:none;align-items:center;justify-content:center;padding:16px;
+  background:rgba(18,26,20,.95)}
+.lbx.on{display:flex}
+.lbx img{max-width:100%;max-height:82dvh}
+.lbx .x{position:absolute;top:calc(16px + env(safe-area-inset-top));right:16px;width:42px;height:42px;
+  background:none;border:1px solid rgba(255,255,255,.3);color:#F2F5EC;font-size:17px;cursor:pointer;line-height:1}
+
+/* footer */
+.foot{text-align:center;padding:52px 0 8px}
+.foot .sig{font-family:var(--serif);font-style:italic;font-size:29px;line-height:1.2}
+.foot p{font-size:14px;color:var(--ink-2);margin-top:14px;max-width:30ch;margin-left:auto;margin-right:auto}
+.foot .stamp{font-size:10px;letter-spacing:.28em;color:var(--ink-3);margin-top:26px;text-indent:.28em}
+
+/* music */
+.music{position:fixed;right:14px;top:calc(14px + env(safe-area-inset-top));z-index:100;
+  min-width:44px;height:44px;padding:0 12px;border:1px solid var(--rule);background:var(--card);
+  color:var(--brass);display:none;align-items:center;justify-content:center;cursor:pointer;
+  font:inherit;font-size:9.5px;letter-spacing:.16em;text-indent:.16em}
+.music.show{display:flex}
+.music.on{background:var(--leaf);border-color:var(--leaf);color:var(--card)}
+
+.rv{opacity:0;transition:opacity 1s ease}
+.rv.in{opacity:1}
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+/* contacts */
+.people{margin-top:24px}
+.person{display:flex;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid var(--rule)}
+.person:last-child{border-bottom:none}
+.person .id{flex:1;min-width:0}
+.person .nm{font-family:var(--serif);font-weight:500;font-size:19px;line-height:1.25}
+.person .num{font-size:14px;color:var(--ink-3);margin-top:3px;letter-spacing:.02em}
+.ico{width:46px;height:46px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;
+  text-decoration:none;border:1px solid var(--rule);background:var(--card);transition:transform .18s ease}
+.ico:active{transform:scale(.9)}
+.ico svg{width:21px;height:21px}
+.ph{fill:var(--leaf)}
+.wa-b{fill:#25D366}
+.wa-g{fill:var(--card)}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important}.rv{opacity:1}}
+</style>
+</head>
+<body class="shut">
+
+<!-- ── cover ── -->
+<div id="cover">
+  <div class="art-blur" id="artBlur"></div>
+  <div class="art-wrap" id="artWrap"><img id="artImg" alt="Kanesh and Anusha — the wedding dinner"></div>
+  <div class="art-veil"></div>
+  <div class="bloom"></div>
+  <div class="in">
+    <p class="overline">THE RECEPTION DINNER</p>
+    <h1 class="cover-names">Kanesh<i>and</i>Anusha</h1>
+    <p class="cover-sub">request the pleasure of your company</p>
+    <p class="cover-date">SAT 05 DEC 2026 &nbsp;&middot;&nbsp; KAMUNTING</p>
+  </div>
+  <button class="openBtn" id="openBtn">OPEN</button>
+</div>
+
+<button class="music" id="music">MUSIC</button>
+<audio id="song" src="music.mp3" loop preload="none"></audio>
+
+<main>
+
+  <!-- invitation -->
+  <section class="rv" id="invitation">
+    <p class="label">WITH THE BLESSINGS OF OUR FAMILIES</p>
+    <h2>You are warmly invited to our<br><em>reception dinner</em></h2>
+    <div class="rule"></div>
+
+    <div class="portrait" id="portrait">
+      <img src="couple.jpg" alt="Kanesh and Anusha" onerror="this.closest('.portrait').remove()">
+    </div>
+
+    <div class="hosts">
+      <div class="host">
+        <p class="rel">GROOM&rsquo;S PARENTS</p>
+        <p class="nm">Mr. K. Maheswaran<br>&amp; Mrs. P. Thilagam</p>
+        <p class="pl">Ipoh, Perak</p>
+      </div>
+      <div class="vline"></div>
+      <div class="host">
+        <p class="rel">BRIDE&rsquo;S PARENTS</p>
+        <p class="nm">Mr. C. Sugumaran<br>&amp; Mrs. N. Shanila Rani</p>
+        <p class="pl">Kamunting, Perak</p>
+      </div>
+    </div>
+
+    <div class="couple">
+      <p class="who">Kanesh</p>
+      <p class="role">THE GROOM</p>
+      <p class="amp">&amp;</p>
+      <p class="who">Anusha</p>
+      <p class="role">THE BRIDE</p>
+    </div>
+
+    <p class="lede">Hosted with love by the bride&rsquo;s family, one evening after the temple ceremony in Ipoh.</p>
+  </section>
+
+  <!-- when -->
+  <section class="rv" id="when">
+    <p class="label">THE EVENING</p>
+    <h2>Dinner is at seven thirty</h2>
+
+    <div class="plate">
+      <p class="hr">7:30<sup>PM</sup></p>
+      <div class="dstack">
+        <span class="side">SATURDAY</span>
+        <span class="day">05</span>
+        <span class="side">DECEMBER</span>
+      </div>
+      <p class="yr">2026</p>
+      <p class="at">Dewan MPT Kamunting<br>Kamunting, Perak</p>
+    </div>
+
+    <div class="count" id="countdown"></div>
+    <div class="cal" id="calendar"></div>
+
+    <div class="acts">
+      <a class="btn solid" href="#rsvp" data-jump="rsvp">CONFIRM ATTENDANCE</a>
+      <a class="btn quiet" id="calBtn" target="_blank" rel="noopener" href="#">ADD TO CALENDAR</a>
+    </div>
+  </section>
+
+  <!-- gallery -->
+  <section class="rv" id="gallery" hidden>
+    <p class="label">PHOTOGRAPHS</p>
+    <h2>A year, more or less</h2>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- venue -->
+  <section class="rv" id="venue">
+    <p class="label">THE VENUE</p>
+    <div class="addr">
+      <p class="v">Dewan MPT Kamunting</p>
+      <p class="a">No. 12, Jalan Taiping,<br>Kampong Jana Baru,<br>34600 Kamunting, Perak</p>
+      <p class="p">Free parking on the open ground beside the hall</p>
+    </div>
+    <div class="acts">
+      <div class="pair">
+        <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=Dewan+MPT+Kamunting+Kampong+Jana+Baru+Perak" target="_blank" rel="noopener">MAPS</a>
+        <a class="btn" href="https://waze.com/ul?q=Dewan%20MPT%20Kamunting&amp;navigate=yes" target="_blank" rel="noopener">WAZE</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- dress -->
+  <section class="rv" id="dress">
+    <p class="label">DRESS CODE</p>
+    <div class="dress">
+      <p class="big">Traditional or formal</p>
+      <p class="lede">Jewel tones photograph beautifully under the hall lights. Wear something you can eat in.</p>
+    </div>
+  </section>
+
+  <!-- rsvp -->
+  <section class="rv" id="rsvp">
+    <p class="label">ATTENDANCE</p>
+    <h2>Let us know you&rsquo;re coming</h2>
+    <p class="lede">One reply per family is plenty. Send another later if your numbers change.</p>
+
+    <div class="form" id="form">
+      <div class="f">
+        <span class="lab">YOU&rsquo;RE HERE FOR</span>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="side" value="Bride's Side" checked><span>Bride&rsquo;s side</span></label>
+          <label class="opt"><input type="radio" name="side" value="Groom's Side"><span>Groom&rsquo;s side</span></label>
+        </div>
+      </div>
+      <div class="f">
+        <label for="nm">YOUR NAME</label>
+        <input id="nm" type="text" autocomplete="name" placeholder="How we should read it out">
+      </div>
+      <div class="f">
+        <span class="lab">WILL YOU JOIN US</span>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="attend" value="Reception" checked><span>Yes, gladly</span></label>
+          <label class="opt"><input type="radio" name="attend" value="No"><span>Sadly, no</span></label>
+        </div>
+      </div>
+      <div class="f" id="paxF">
+        <label for="pax">HOW MANY, CHILDREN INCLUDED</label>
+        <select id="pax"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8+</option></select>
+      </div>
+      <div class="f" id="foodF">
+        <span class="lab">WHAT WE SHOULD PLATE</span>
+        <div class="opts three">
+          <label class="opt"><input type="radio" name="food" value="Non-Vegetarian" checked><span>Non-veg</span></label>
+          <label class="opt"><input type="radio" name="food" value="Vegetarian"><span>Vegetarian</span></label>
+          <label class="opt"><input type="radio" name="food" value="Halal"><span>Halal</span></label>
+        </div>
+      </div>
+      <div class="f">
+        <label for="wish">A NOTE FOR THE GUESTBOOK</label>
+        <textarea id="wish" placeholder="A blessing, a joke, a warning about the dance floor&hellip;"></textarea>
+      </div>
+      <button class="btn solid" id="send" style="width:100%">SEND REPLY</button>
+      <p class="note" id="note">We&rsquo;d love to know by <b>20 November 2026</b></p>
+    </div>
+
+    <div class="thanks" id="thanks" style="display:none">
+      <p class="gv">Thank you</p>
+      <p id="thanksNote">Your reply is with us.</p>
+      <button class="link" id="again">SEND ANOTHER REPLY</button>
+    </div>
+  </section>
+
+  <!-- guestbook -->
+  <section class="rv" id="guestbook">
+    <p class="label">GUESTBOOK</p>
+    <h2>Notes from everyone</h2>
+    <div class="wishes" id="wishBox"><p class="empty">No notes yet. Write the first one above.</p></div>
+    <button class="link" id="more" style="display:none"></button>
+  </section>
+
+  <!-- gift -->
+  <section class="rv" id="gift">
+    <p class="label">GIFTS</p>
+    <h2>Your presence is the gift</h2>
+    <p class="lede">Truly. But a few of you will ask, so here it is.</p>
+    <div class="gifts">
+      <!-- EDIT: data-bank / data-acc / data-wa (60 + mobile number, no leading zero) -->
+      <button class="gcard" data-role="GROOM" data-name="Kanesh" data-qr="duitnow-groom.png"
+              data-bank="Maybank" data-acc="1234 5678 9012" data-wa="60123456789">
+        <span class="rl">GROOM</span><span class="nm">Kanesh</span><span class="go">SHOW QR</span>
+      </button>
+      <button class="gcard" data-role="BRIDE" data-name="Anusha" data-qr="duitnow-bride.png"
+              data-bank="Maybank" data-acc="9876 5432 1098" data-wa="60123456789">
+        <span class="rl">BRIDE</span><span class="nm">Anusha</span><span class="go">SHOW QR</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- contact -->
+  <section class="rv" id="contact">
+    <p class="label">ANYTHING ELSE</p>
+    <h2>Call or message us</h2>
+    <div class="people">
+      <div class="person">
+        <div class="id"><p class="nm">Dineshwaran</p><p class="num">013-518 4370</p></div>
+        <a class="ico" href="tel:+60135184370" aria-label="Call Dineshwaran"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="ph" d="M21,15v3.93a2,2,0,0,1-2.29,2A18,18,0,0,1,3.14,5.29,2,2,0,0,1,5.13,3H9a1,1,0,0,1,1,.89,10.74,10.74,0,0,0,1,3.78,1,1,0,0,1-.42,1.26l-.86.49a1,1,0,0,0-.33,1.46,14.08,14.08,0,0,0,3.69,3.69,1,1,0,0,0,1.46-.33l.49-.86A1,1,0,0,1,16.33,13a10.74,10.74,0,0,0,3.78,1A1,1,0,0,1,21,15Z"/></svg></a>
+        <a class="ico" href="https://wa.me/60135184370" target="_blank" rel="noopener" aria-label="WhatsApp Dineshwaran"><svg viewBox="0 0 32 32" aria-hidden="true"><path class="wa-b" d="M17,0C8.7,0,2,6.7,2,15c0,3.4,1.1,6.6,3.2,9.2l-2.1,6.4c-0.1,0.4,0,0.8,0.3,1.1C3.5,31.9,3.8,32,4,32c0.1,0,0.3,0,0.4-0.1l6.9-3.1C13.1,29.6,15,30,17,30c8.3,0,15-6.7,15-15S25.3,0,17,0z"/><path class="wa-g" d="M25.7,20.5c-0.4,1.2-1.9,2.2-3.2,2.4C22.2,23,21.9,23,21.5,23c-0.8,0-2-0.2-4.1-1.1c-2.4-1-4.8-3.1-6.7-5.8L10.7,16C10.1,15.1,9,13.4,9,11.6c0-2.2,1.1-3.3,1.5-3.8c0.5-0.5,1.2-0.8,2-0.8c0.2,0,0.3,0,0.5,0c0.7,0,1.2,0.2,1.7,1.2l0.4,0.8c0.3,0.8,0.7,1.7,0.8,1.8c0.3,0.6,0.3,1.1,0,1.6c-0.1,0.3-0.3,0.5-0.5,0.7c-0.1,0.2-0.2,0.3-0.3,0.3c-0.1,0.1-0.1,0.1-0.2,0.2c0.3,0.5,0.9,1.4,1.7,2.1c1.2,1.1,2.1,1.4,2.6,1.6l0,0c0.2-0.2,0.4-0.6,0.7-0.9l0.1-0.2c0.5-0.7,1.3-0.9,2.1-0.6c0.4,0.2,2.6,1.2,2.6,1.2l0.2,0.1c0.3,0.2,0.7,0.3,0.9,0.7C26.2,18.5,25.9,19.8,25.7,20.5z"/></svg></a>
+      </div>
+      <div class="person">
+        <div class="id"><p class="nm">Uthaya Kumar</p><p class="num">013-390 2514</p></div>
+        <a class="ico" href="tel:+60133902514" aria-label="Call Uthaya Kumar"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="ph" d="M21,15v3.93a2,2,0,0,1-2.29,2A18,18,0,0,1,3.14,5.29,2,2,0,0,1,5.13,3H9a1,1,0,0,1,1,.89,10.74,10.74,0,0,0,1,3.78,1,1,0,0,1-.42,1.26l-.86.49a1,1,0,0,0-.33,1.46,14.08,14.08,0,0,0,3.69,3.69,1,1,0,0,0,1.46-.33l.49-.86A1,1,0,0,1,16.33,13a10.74,10.74,0,0,0,3.78,1A1,1,0,0,1,21,15Z"/></svg></a>
+        <a class="ico" href="https://wa.me/60133902514" target="_blank" rel="noopener" aria-label="WhatsApp Uthaya Kumar"><svg viewBox="0 0 32 32" aria-hidden="true"><path class="wa-b" d="M17,0C8.7,0,2,6.7,2,15c0,3.4,1.1,6.6,3.2,9.2l-2.1,6.4c-0.1,0.4,0,0.8,0.3,1.1C3.5,31.9,3.8,32,4,32c0.1,0,0.3,0,0.4-0.1l6.9-3.1C13.1,29.6,15,30,17,30c8.3,0,15-6.7,15-15S25.3,0,17,0z"/><path class="wa-g" d="M25.7,20.5c-0.4,1.2-1.9,2.2-3.2,2.4C22.2,23,21.9,23,21.5,23c-0.8,0-2-0.2-4.1-1.1c-2.4-1-4.8-3.1-6.7-5.8L10.7,16C10.1,15.1,9,13.4,9,11.6c0-2.2,1.1-3.3,1.5-3.8c0.5-0.5,1.2-0.8,2-0.8c0.2,0,0.3,0,0.5,0c0.7,0,1.2,0.2,1.7,1.2l0.4,0.8c0.3,0.8,0.7,1.7,0.8,1.8c0.3,0.6,0.3,1.1,0,1.6c-0.1,0.3-0.3,0.5-0.5,0.7c-0.1,0.2-0.2,0.3-0.3,0.3c-0.1,0.1-0.1,0.1-0.2,0.2c0.3,0.5,0.9,1.4,1.7,2.1c1.2,1.1,2.1,1.4,2.6,1.6l0,0c0.2-0.2,0.4-0.6,0.7-0.9l0.1-0.2c0.5-0.7,1.3-0.9,2.1-0.6c0.4,0.2,2.6,1.2,2.6,1.2l0.2,0.1c0.3,0.2,0.7,0.3,0.9,0.7C26.2,18.5,25.9,19.8,25.7,20.5z"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <p class="sig">Kanesh &amp; Anusha</p>
+    <p>We&rsquo;ve waited a long time for this room to be full. Please be in it.</p>
+  </div>
+
+</main>
+
+<!-- gift modal -->
+<div class="veil" id="veil">
+  <div class="modal">
+    <button class="x" id="mClose" aria-label="Close">&times;</button>
+    <p class="rl" id="mRole"></p>
+    <p class="nm" id="mName"></p>
+    <div class="qrbox" id="mQr"></div>
+    <p class="bk" id="mBank"></p>
+    <p class="ac" id="mAcc"></p>
+    <a class="mbtn" id="mDl" download>SAVE THE QR</a>
+    <a class="mbtn always" id="mWa" target="_blank" rel="noopener">TELL THEM IT&rsquo;S SENT</a>
+    <p class="tip" id="mTip"></p>
+  </div>
+</div>
+
+<!-- lightbox -->
+<div class="lbx" id="lbx">
+  <button class="x" id="lbxX" aria-label="Close">&times;</button>
+  <img id="lbxI" alt="">
+</div>
+
+<script>
+/* ═══ same Google Sheet as the wedding page ═══ */
+const SHEET_API = "https://script.google.com/macros/s/AKfycbzhds70oeGiEvNm7dClu4LZWmyBpr-pJFhqOUmqgezcb3piwdgocF1MBXGymD7ntbw/exec";
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ── open ── */
+const cover = $('cover'), music = $('music'), song = $('song');
+let opened = false, playing = false;
+function playMusic(){ song.play().then(() => { playing = true; music.classList.add('on'); }).catch(() => {}); }
+function open_(){
+  if(opened) return; opened = true;
+  const art = cover.classList.contains('art');
+  if(art) cover.classList.add('into');                 // push through the light first
+  setTimeout(() => cover.classList.add('open'), art ? 700 : 0);
+  setTimeout(() => { document.body.classList.remove('shut'); window.scrollTo(0,0); }, art ? 900 : 0);
+  setTimeout(() => cover.remove(), art ? 2000 : 1100);
+  setTimeout(() => music.classList.add('show'), art ? 1300 : 400);
+  playMusic();
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
+}
+
+/* the illustrated cover, if you've put one in the folder */
+(function findArt(list, i){
+  if(i >= list.length) return;                          // none found — plain typographic cover
+  const probe = new Image();
+  probe.onload = () => {
+    $('artImg').src = list[i];
+    $('artBlur').style.backgroundImage = 'url("' + list[i] + '")';
+    cover.classList.add('art');
+    if(!matchMedia('(prefers-reduced-motion: reduce)').matches) fireflies();
+  };
+  probe.onerror = () => findArt(list, i + 1);
+  probe.src = list[i];
+})(['cover.png','cover.jpg','cover.webp'], 0);
+
+function fireflies(){
+  for(let i = 0; i < 20; i++){
+    const f = document.createElement('span');
+    f.className = 'fly';
+    const size = 3 + Math.random() * 4;
+    f.style.width = f.style.height = size.toFixed(1) + 'px';
+    f.style.left = (Math.random() * 100).toFixed(1) + '%';
+    f.style.top = (55 + Math.random() * 50).toFixed(1) + '%';
+    f.style.setProperty('--dx', (Math.random() * 70 - 35).toFixed(0) + 'px');
+    f.style.animationDuration = (9 + Math.random() * 9).toFixed(1) + 's';
+    f.style.animationDelay = (-Math.random() * 14).toFixed(1) + 's';
+    cover.appendChild(f);
+  }
+}
+$('openBtn').addEventListener('click', open_);
+cover.addEventListener('click', open_);
+music.addEventListener('click', () => {
+  if(playing){ song.pause(); playing = false; music.classList.remove('on'); }
+  else playMusic();
+});
+
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+}), {threshold:.08, rootMargin:'0px 0px -40px 0px'});
+
+document.querySelectorAll('[data-jump]').forEach(a => a.addEventListener('click', e => {
+  e.preventDefault(); $(a.dataset.jump).scrollIntoView({behavior:'smooth', block:'start'});
+}));
+
+/* ── countdown ── */
+const TARGET = new Date('2026-12-05T19:30:00+08:00').getTime();
+const cdEl = $('countdown'), pad = n => String(n).padStart(2,'0');
+function tick(){
+  const d = TARGET - Date.now();
+  if(d <= 0){ cdEl.innerHTML = '<div class="u" style="grid-column:1/-1"><b>Tonight</b><span>SEE YOU THERE</span></div>'; return; }
+  const D = Math.floor(d/864e5), H = Math.floor(d%864e5/36e5), M = Math.floor(d%36e5/6e4), S = Math.floor(d%6e4/1e3);
+  cdEl.innerHTML =
+    '<div class="u"><b>'+D+'</b><span>DAYS</span></div>' +
+    '<div class="u"><b>'+pad(H)+'</b><span>HRS</span></div>' +
+    '<div class="u"><b>'+pad(M)+'</b><span>MIN</span></div>' +
+    '<div class="u"><b>'+pad(S)+'</b><span>SEC</span></div>';
+}
+tick(); setInterval(tick, 1000);
+
+/* ── December 2026, with the 5th circled ── */
+(function(){
+  const Y = 2026, Mo = 11, DAY = 5;
+  const lead = (new Date(Y, Mo, 1).getDay() + 6) % 7;      // Monday-first
+  const days = new Date(Y, Mo + 1, 0).getDate();
+  let cells = '';
+  for(let i = 0; i < lead; i++) cells += '<td></td>';
+  for(let d = 1; d <= days; d++){
+    cells += d === DAY ? '<td class="on"><span>'+d+'</span></td>' : '<td>'+d+'</td>';
+    if((lead + d) % 7 === 0) cells += '</tr><tr>';
+  }
+  $('calendar').innerHTML = '<p class="mo">December 2026</p><table><thead><tr>' +
+    ['Mo','Tu','We','Th','Fr','Sa','Su'].map(h => '<th>'+h+'</th>').join('') +
+    '</tr></thead><tbody><tr>' + cells + '</tr></tbody></table>';
+})();
+
+$('calBtn').href = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+  + '&text=' + encodeURIComponent('Wedding Reception of Kanesh & Anusha')
+  + '&dates=20261205T113000Z/20261205T150000Z'
+  + '&location=' + encodeURIComponent('Dewan MPT Kamunting, No. 12, Jalan Taiping, Kampong Jana Baru, 34600 Kamunting, Perak')
+  + '&details=' + encodeURIComponent('Dinner from 7:30 PM, hosted by the bride\u2019s family.');
+
+/* ── gallery ── */
+const PHOTOS = ['photo1.jpg','photo2.jpg','photo3.jpg','photo4.jpg','photo5.jpg','photo6.jpg','photo7.jpg','photo8.jpg'];
+const lbx = $('lbx'), lbxI = $('lbxI');
+let shots = [], at = 0;
+(async function(){
+  const found = [];
+  await Promise.all(PHOTOS.map(src => new Promise(res => {
+    const im = new Image();
+    im.onload = () => { found.push(src); res(); };
+    im.onerror = () => res();
+    im.src = src;
+  })));
+  if(!found.length) return;
+  found.sort();
+  shots = found;
+  $('grid').innerHTML = found.slice(0, 4).map((s, i) => {
+    const extra = (i === 3 && found.length > 4) ? '<span class="more">+' + (found.length - 4) + '</span>' : '';
+    return '<figure data-i="'+i+'"><img src="'+s+'" alt="Kanesh and Anusha" loading="lazy">'+extra+'</figure>';
+  }).join('');
+  $('gallery').hidden = false;
+})();
+$('grid').addEventListener('click', e => {
+  const f = e.target.closest('figure'); if(f) show(+f.dataset.i);
+});
+function show(i){
+  at = (i + shots.length) % shots.length;
+  lbxI.src = shots[at]; lbx.classList.add('on'); document.body.style.overflow = 'hidden';
+}
+function closeLbx(){ lbx.classList.remove('on'); document.body.style.overflow = ''; }
+$('lbxX').addEventListener('click', closeLbx);
+lbx.addEventListener('click', e => { if(e.target === lbx || e.target === lbxI) closeLbx(); });
+let sx = 0;
+lbx.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, {passive:true});
+lbx.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - sx;
+  if(Math.abs(dx) > 50) show(at + (dx < 0 ? 1 : -1));
+}, {passive:true});
+
+/* ── gift ── */
+const veil = $('veil');
+const GIFT_MSG = 'Hi! I\u2019ve just sent a little something by DuitNow. Wishing you both every happiness \u2014 see you at the reception!';
+document.querySelectorAll('.gcard').forEach(b => b.addEventListener('click', () => {
+  const d = b.dataset;
+  $('mRole').textContent = d.role;
+  $('mName').textContent = d.name;
+  $('mBank').textContent = d.bank || '';
+  $('mAcc').textContent = d.acc || '';
+  const box = $('mQr'), dl = $('mDl'), tip = $('mTip');
+  box.innerHTML = '<span class="soon">The QR is on its way. Use the account number for now.</span>';
+  dl.classList.remove('show'); tip.textContent = '';
+  const im = new Image();
+  im.onload = () => {
+    box.innerHTML = ''; im.alt = 'DuitNow QR for ' + d.name; box.appendChild(im);
+    dl.href = d.qr; dl.setAttribute('download', 'DuitNow-' + d.name + '.png'); dl.classList.add('show');
+    tip.textContent = 'Save it, then scan from your banking app.';
+  };
+  im.src = d.qr;
+  $('mWa').href = 'https://wa.me/' + d.wa + '?text=' + encodeURIComponent(GIFT_MSG);
+  veil.classList.add('on'); document.body.style.overflow = 'hidden';
+}));
+function closeVeil(){ veil.classList.remove('on'); document.body.style.overflow = ''; }
+$('mClose').addEventListener('click', closeVeil);
+veil.addEventListener('click', e => { if(e.target === veil) closeVeil(); });
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  if(veil.classList.contains('on')) closeVeil();
+  if(lbx.classList.contains('on')) closeLbx();
+});
+
+/* ── RSVP ── */
+const send = $('send'), note = $('note'), paxF = $('paxF'), foodF = $('foodF');
+const sentNames = new Set();
+let dupOK = false, replies = 0;
+
+function syncAttend(){
+  const coming = (document.querySelector('input[name=attend]:checked') || {}).value === 'Reception';
+  paxF.style.display = coming ? '' : 'none';
+  foodF.style.display = coming ? '' : 'none';
+}
+document.querySelectorAll('input[name=attend]').forEach(r => r.addEventListener('change', syncAttend));
+syncAttend();
+$('nm').addEventListener('input', () => { dupOK = false; });
+
+send.addEventListener('click', async () => {
+  const name = $('nm').value.trim();
+  if(!name){ note.textContent = 'Add your name so we know who to seat.'; $('nm').focus(); return; }
+  const key = name.toLowerCase().replace(/\s+/g,' ');
+  if(sentNames.has(key) && !dupOK){
+    dupOK = true;
+    note.innerHTML = 'We already have a reply from <b>' + esc(name) + '</b> on this phone. Tap send again to add it anyway.';
+    return;
+  }
+  const coming = (document.querySelector('input[name=attend]:checked') || {}).value === 'Reception';
+  const payload = {
+    side: (document.querySelector('input[name=side]:checked') || {}).value || '',
+    name: name,
+    attending: coming ? 'Reception Only' : "Can't Make It",
+    guests: coming ? $('pax').value : '0',
+    food: coming ? ((document.querySelector('input[name=food]:checked') || {}).value || '') : '',
+    wish: $('wish').value.trim()
+  };
+  send.disabled = true; send.textContent = 'SENDING\u2026';
+  try{
+    await fetch(SHEET_API, {method:'POST', body:JSON.stringify(payload)});
+    sentNames.add(key); dupOK = false; replies++;
+    $('thanksNote').textContent = replies > 1
+      ? 'That\u2019s ' + replies + ' replies from this phone.'
+      : (coming ? 'Your seat is noted. See you on the fifth.' : 'We\u2019ll miss you \u2014 thank you for telling us.');
+    $('form').style.display = 'none'; $('thanks').style.display = 'block';
+    if(payload.wish) addWish({name: payload.name, wish: payload.wish});
+  }catch(err){
+    note.textContent = 'That didn\u2019t go through. Check your signal and send again.';
+    send.disabled = false; send.textContent = 'SEND REPLY';
+  }
+});
+
+$('again').addEventListener('click', () => {
+  $('nm').value = ''; $('wish').value = ''; $('pax').selectedIndex = 0;
+  const a = document.querySelector('input[name=attend]'); if(a) a.checked = true;
+  const f = document.querySelector('input[name=food]'); if(f) f.checked = true;
+  syncAttend();
+  note.innerHTML = 'We\u2019d love to know by <b>20 November 2026</b>';
+  send.disabled = false; send.textContent = 'SEND REPLY';
+  $('thanks').style.display = 'none'; $('form').style.display = '';
+  $('nm').focus({preventScroll:true});
+});
+
+/* ── guestbook ── */
+const box = $('wishBox'), moreBtn = $('more'), FIRST = 3;
+let wishes = [], openAll = false;
+const one = w => '<div class="wish"><p class="who">' + esc(w.name).toUpperCase() + '</p><p class="msg">' + esc(w.wish) + '</p></div>';
+function paint(){
+  if(!wishes.length){ box.innerHTML = '<p class="empty">No notes yet. Write the first one above.</p>'; moreBtn.style.display = 'none'; return; }
+  box.innerHTML = (openAll ? wishes : wishes.slice(0, FIRST)).map(one).join('');
+  box.classList.toggle('open', openAll);
+  if(openAll) box.scrollTop = 0;
+  if(wishes.length > FIRST){
+    moreBtn.style.display = 'block';
+    moreBtn.textContent = openAll ? 'SHOW FEWER' : 'READ ALL ' + wishes.length + ' NOTES';
+  } else moreBtn.style.display = 'none';
+}
+moreBtn.addEventListener('click', () => { openAll = !openAll; paint(); });
+function addWish(w){ wishes.unshift(w); paint(); }
+(async function(){
+  try{
+    const res = await fetch(SHEET_API + '?action=wishes');
+    const list = await res.json();
+    wishes = (list || []).filter(w => w && w.wish && String(w.wish).trim()).reverse();
+    paint();
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
