@@ -48,7 +48,7 @@ a{color:inherit}
 img{max-width:100%;display:block}
 
 /* ── cover ── */
-#cover{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;
+#cover{position:fixed;inset:0;z-index:120;cursor:pointer;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;background:var(--paper);
   padding:calc(56px + env(safe-area-inset-top)) 28px calc(48px + env(safe-area-inset-bottom));
   transition:opacity .9s ease,transform 1s var(--ease)}
@@ -276,11 +276,20 @@ input:focus,textarea:focus,select:focus{border-color:var(--leaf)}
 
 /* music */
 .music{position:fixed;right:14px;top:calc(14px + env(safe-area-inset-top));z-index:100;
-  min-width:44px;height:44px;padding:0 12px;border:1px solid var(--rule);background:var(--card);
-  color:var(--brass);display:none;align-items:center;justify-content:center;cursor:pointer;
-  font:inherit;font-size:9.5px;letter-spacing:.16em;text-indent:.16em}
-.music.show{display:flex}
-.music.on{background:var(--leaf);border-color:var(--leaf);color:var(--card)}
+  width:46px;height:46px;padding:0;border:none;border-radius:50%;display:none;cursor:pointer;
+  box-shadow:0 4px 14px rgba(27,41,31,.28),inset 0 0 0 1px rgba(0,0,0,.35);
+  background:
+    radial-gradient(circle,#EFE6D2 0 2px,transparent 2.5px),
+    radial-gradient(circle,#7C5C1E 0 8px,transparent 8.5px),
+    repeating-radial-gradient(circle,#202721 0 1.4px,#2E362F 1.4px 2.9px);
+  animation:spin 3.6s linear infinite;animation-play-state:paused}
+.music.show{display:block}
+.music.on{animation-play-state:running;box-shadow:0 4px 18px rgba(124,92,30,.45),inset 0 0 0 1px rgba(0,0,0,.35)}
+.music::after{content:"";position:absolute;left:50%;top:50%;width:15px;height:2px;
+  transform:translate(-50%,-50%) rotate(38deg);background:rgba(239,230,210,.55);border-radius:2px;
+  opacity:0;transition:opacity .25s ease}
+.music:not(.on)::after{opacity:1}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 .rv{opacity:0;transition:opacity 1s ease}
 .rv.in{opacity:1}
@@ -320,7 +329,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--leaf)}
   <button class="openBtn" id="openBtn">OPEN</button>
 </div>
 
-<button class="music" id="music">MUSIC</button>
+<button class="music" id="music" aria-label="Play or pause the music"></button>
 <audio id="song" src="music.mp3" loop preload="none"></audio>
 
 <main>
@@ -560,6 +569,7 @@ function open_(){
   setTimeout(() => { document.body.classList.remove('shut'); window.scrollTo(0,0); }, art ? 900 : 0);
   setTimeout(() => cover.remove(), art ? 2000 : 1100);
   setTimeout(() => music.classList.add('show'), art ? 1300 : 400);
+  setTimeout(startDrift, art ? 2400 : 1500);
   playMusic();
   document.querySelectorAll('.rv').forEach(el => io.observe(el));
 }
@@ -592,8 +602,33 @@ function fireflies(){
     cover.appendChild(f);
   }
 }
-$('openBtn').addEventListener('click', open_);
+$('openBtn').addEventListener('click', e => { e.stopPropagation(); open_(); });
 cover.addEventListener('click', open_);
+
+/* a slow drift down the page — any touch of yours ends it for good */
+let drifting = false, raf = null, y = 0;
+const docEl = document.documentElement;
+function pageBottom(){
+  return Math.max(document.body.scrollHeight, docEl.scrollHeight) - window.innerHeight;
+}
+function startDrift(){
+  if(drifting || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  drifting = true; y = window.scrollY;
+  let last = performance.now();
+  const speed = Math.min(Math.max((pageBottom() - y) / 100, 30), 80);   // ~100s end to end
+  (function step(now){
+    if(!drifting) return;
+    const dt = Math.min((now - last) / 1000, .05); last = now;
+    const end = pageBottom();
+    y = Math.min(y + speed * dt, end);
+    window.scrollTo(0, y);
+    if(y >= end - 1){ drifting = false; return; }
+    raf = requestAnimationFrame(step);
+  })(performance.now());
+}
+function stopDrift(){ if(!drifting) return; drifting = false; if(raf) cancelAnimationFrame(raf); }
+['touchstart','touchmove','wheel','mousedown','keydown'].forEach(ev =>
+  window.addEventListener(ev, stopDrift, {passive:true}));
 music.addEventListener('click', () => {
   if(playing){ song.pause(); playing = false; music.classList.remove('on'); }
   else playMusic();
@@ -638,11 +673,29 @@ tick(); setInterval(tick, 1000);
     '</tr></thead><tbody><tr>' + cells + '</tr></tbody></table>';
 })();
 
-$('calBtn').href = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+/* Add to calendar — Apple Calendar on iPhone and iPad, Google Calendar on Android.
+   iOS opens a .ics straight into the Calendar "Add Event" sheet; Android opens
+   the Google Calendar app from a template link. Everything else gets Google. */
+const GCAL = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
   + '&text=' + encodeURIComponent('Wedding Reception of Kanesh & Anusha')
   + '&dates=20261205T113000Z/20261205T150000Z'
   + '&location=' + encodeURIComponent('Dewan MPT Kamunting, No. 12, Jalan Taiping, Kampong Jana Baru, 34600 Kamunting, Perak')
   + '&details=' + encodeURIComponent('Dinner from 7:30 PM, hosted by the bride\u2019s family.');
+
+const ua = navigator.userAgent || '';
+const isApple = /iPad|iPhone|iPod/.test(ua)
+  || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)   // iPadOS reports as a Mac
+  || /Macintosh/.test(ua);
+
+const calBtn = $('calBtn');
+if(isApple){
+  calBtn.href = 'reception.ics';
+  calBtn.removeAttribute('target');
+} else {
+  calBtn.href = GCAL;
+  calBtn.target = '_blank';
+  calBtn.rel = 'noopener';
+}
 
 /* ── gallery ── */
 const PHOTOS = ['photo1.jpg','photo2.jpg','photo3.jpg','photo4.jpg','photo5.jpg','photo6.jpg','photo7.jpg','photo8.jpg'];
