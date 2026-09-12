@@ -279,18 +279,16 @@ input:focus,textarea:focus,select:focus{border-color:var(--leaf)}
   width:46px;height:46px;padding:0;border:none;border-radius:50%;display:none;cursor:pointer;
   box-shadow:0 4px 14px rgba(27,41,31,.28),inset 0 0 0 1px rgba(0,0,0,.35);
   background:
-    radial-gradient(circle,#EFE6D2 0 2px,transparent 2.5px),
-    radial-gradient(circle,#7C5C1E 0 8px,transparent 8.5px),
+    radial-gradient(circle,#8A6722 0 10px,transparent 10.5px),
     repeating-radial-gradient(circle,#202721 0 1.4px,#2E362F 1.4px 2.9px);
+  place-items:center;font-size:13px;line-height:1;color:#F6EDD8;
+  text-shadow:0 1px 1px rgba(0,0,0,.4);
   animation:spin 12s linear infinite;opacity:.75;
   transition:opacity .3s ease,box-shadow .3s ease}
-.music.show{display:block}
+.music.show{display:grid}
+.music.silent{opacity:.4}
 .music.on{animation-duration:3.6s;opacity:1;
   box-shadow:0 4px 18px rgba(124,92,30,.45),inset 0 0 0 1px rgba(0,0,0,.35)}
-.music::after{content:"";position:absolute;left:50%;top:50%;width:15px;height:2px;
-  transform:translate(-50%,-50%) rotate(38deg);background:rgba(239,230,210,.55);border-radius:2px;
-  opacity:0;transition:opacity .25s ease}
-.music:not(.on)::after{opacity:1}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 .rv{opacity:0;transition:opacity 1s ease}
@@ -328,10 +326,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--leaf)}
     <p class="cover-sub">request the pleasure of your company</p>
     <p class="cover-date">SAT 05 DEC 2026 &nbsp;&middot;&nbsp; KAMUNTING</p>
   </div>
-  <button class="openBtn" id="openBtn">OPEN</button>
+  <button class="openBtn" id="openBtn">TAP TO OPEN</button>
 </div>
 
-<button class="music" id="music" aria-label="Play or pause the music"></button>
+<button class="music" id="music" aria-label="Play or pause the music">&#9834;</button>
 <audio id="song" src="music.mp3" loop preload="auto" playsinline></audio>
 
 <main>
@@ -568,7 +566,8 @@ song.volume = 0.55;
    audio element's own events rather than guessing. */
 song.addEventListener('play',  () => music.classList.add('on'));
 song.addEventListener('pause', () => music.classList.remove('on'));
-song.addEventListener('error', () => music.remove());   // no music.mp3 in the folder
+song.addEventListener('error', () => music.classList.add('silent'));
+song.addEventListener('canplay', () => music.classList.remove('silent'));
 
 /* If the first attempt is refused, try again on whatever the guest touches next. */
 let retryArmed = false;
@@ -622,8 +621,8 @@ function fireflies(){
     cover.appendChild(f);
   }
 }
-$('openBtn').addEventListener('click', e => { e.stopPropagation(); open_(); });
-cover.addEventListener('click', open_);
+['pointerdown','click','touchstart'].forEach(ev =>
+  cover.addEventListener(ev, open_, {passive:true}));
 
 /* a slow drift down the page — any touch of yours ends it for good */
 let drifting = false, raf = null, y = 0;
@@ -650,6 +649,7 @@ function stopDrift(){ if(!drifting) return; drifting = false; if(raf) cancelAnim
 ['touchstart','touchmove','wheel','mousedown','keydown'].forEach(ev =>
   window.addEventListener(ev, stopDrift, {passive:true}));
 music.addEventListener('click', () => {
+  if(music.classList.contains('silent')) song.load();      // try the file again
   if(song.paused) song.play().catch(() => {});
   else song.pause();
 });
