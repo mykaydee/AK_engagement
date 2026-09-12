@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Kanesh and Anusha//Reception Dinner//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:reception-20261205-kanesh-anusha@invitation
+DTSTAMP:20260101T000000Z
+DTSTART:20261205T113000Z
+DTEND:20261205T150000Z
+SUMMARY:Wedding Reception of Kanesh & Anusha
+LOCATION:Dewan MPT Kamunting\, No. 12\, Jalan Taiping\, Kampong Jana Baru\
+ , 34600 Kamunting\, Perak
+DESCRIPTION:Dinner from 7:30 PM\, hosted by the bride's family.
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Kanesh & Anusha's reception is tomorrow
+END:VALARM
+END:VEVENT
+END:VCALENDAR
