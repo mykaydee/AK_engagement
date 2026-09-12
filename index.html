@@ -282,9 +282,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--leaf)}
     radial-gradient(circle,#EFE6D2 0 2px,transparent 2.5px),
     radial-gradient(circle,#7C5C1E 0 8px,transparent 8.5px),
     repeating-radial-gradient(circle,#202721 0 1.4px,#2E362F 1.4px 2.9px);
-  animation:spin 3.6s linear infinite;animation-play-state:paused}
+  animation:spin 12s linear infinite;opacity:.75;
+  transition:opacity .3s ease,box-shadow .3s ease}
 .music.show{display:block}
-.music.on{animation-play-state:running;box-shadow:0 4px 18px rgba(124,92,30,.45),inset 0 0 0 1px rgba(0,0,0,.35)}
+.music.on{animation-duration:3.6s;opacity:1;
+  box-shadow:0 4px 18px rgba(124,92,30,.45),inset 0 0 0 1px rgba(0,0,0,.35)}
 .music::after{content:"";position:absolute;left:50%;top:50%;width:15px;height:2px;
   transform:translate(-50%,-50%) rotate(38deg);background:rgba(239,230,210,.55);border-radius:2px;
   opacity:0;transition:opacity .25s ease}
@@ -330,7 +332,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--leaf)}
 </div>
 
 <button class="music" id="music" aria-label="Play or pause the music"></button>
-<audio id="song" src="music.mp3" loop preload="none"></audio>
+<audio id="song" src="music.mp3" loop preload="auto" playsinline></audio>
 
 <main>
 
@@ -559,8 +561,26 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;
 
 /* ── open ── */
 const cover = $('cover'), music = $('music'), song = $('song');
-let opened = false, playing = false;
-function playMusic(){ song.play().then(() => { playing = true; music.classList.add('on'); }).catch(() => {}); }
+let opened = false;
+song.volume = 0.55;
+
+/* The browser owns the truth about whether sound is coming out, so mirror the
+   audio element's own events rather than guessing. */
+song.addEventListener('play',  () => music.classList.add('on'));
+song.addEventListener('pause', () => music.classList.remove('on'));
+song.addEventListener('error', () => music.remove());   // no music.mp3 in the folder
+
+/* If the first attempt is refused, try again on whatever the guest touches next. */
+let retryArmed = false;
+function armRetry(){
+  if(retryArmed) return; retryArmed = true;
+  const go = () => { song.play().catch(() => {}); off(); };
+  const off = () => ['touchstart','click','keydown'].forEach(e =>
+    document.removeEventListener(e, go));
+  ['touchstart','click','keydown'].forEach(e =>
+    document.addEventListener(e, go, {once:true, passive:true}));
+}
+function playMusic(){ song.play().catch(armRetry); }
 function open_(){
   if(opened) return; opened = true;
   const art = cover.classList.contains('art');
@@ -630,8 +650,8 @@ function stopDrift(){ if(!drifting) return; drifting = false; if(raf) cancelAnim
 ['touchstart','touchmove','wheel','mousedown','keydown'].forEach(ev =>
   window.addEventListener(ev, stopDrift, {passive:true}));
 music.addEventListener('click', () => {
-  if(playing){ song.pause(); playing = false; music.classList.remove('on'); }
-  else playMusic();
+  if(song.paused) song.play().catch(() => {});
+  else song.pause();
 });
 
 const io = new IntersectionObserver(es => es.forEach(e => {
