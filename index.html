@@ -14,7 +14,6 @@
        cover.png          the illustrated cover, 9:16
        music.mp3          background music
        reception.ics      the calendar event, needed by iPhones
-       couple.jpg         portrait near the top
        photo1.jpg … photo8.jpg      gallery
        duitnow-groom.png  duitnow-bride.png     payment QRs
        bg-page.jpg        optional page background (see note in the CSS)
@@ -54,8 +53,9 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;scroll-padding-bottom:calc(var(--bar) + 16px)}
+html{background:var(--paper)}
 body{font-family:var(--sans);font-size:16.5px;line-height:1.62;color:var(--ink);
-  background:var(--paper);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  background:transparent;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 img{max-width:100%;display:block}
 a{color:inherit}
 button{font:inherit;color:inherit}
@@ -64,7 +64,7 @@ main,.tabs,.music{transition:opacity .6s ease}
 /* ── page background ──────────────────────────────────────────────────
    A fixed layer rather than background-attachment, which stutters badly
    on iOS. Drop in bg-page.jpg and it appears behind everything. ── */
-#backdrop{position:fixed;inset:0;z-index:-1;background:var(--paper) center/cover no-repeat}
+#backdrop{position:fixed;inset:0;z-index:-1;background:center/cover no-repeat}
 #backdrop.has-art::after{content:"";position:absolute;inset:0;background:rgba(239,240,233,.34)}
 
 /* ═══════════ cover ═══════════ */
@@ -142,10 +142,8 @@ h2 em{font-style:italic;font-weight:400}
   transition:opacity .7s var(--ease),transform .7s var(--ease)}
 .rv.in{opacity:1;transform:none}
 
-.portrait{width:min(70%,240px);margin:30px auto 0}
-.portrait img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:2px;background:#E4E7DC}
 
-.hosts{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:30px}
+.hosts{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:32px}
 .host{text-align:center}
 .host .rel{font-size:10px;letter-spacing:.18em;color:var(--ink-3);text-indent:.18em}
 .host .nm{font-size:15px;line-height:1.55;margin-top:8px}
@@ -194,14 +192,46 @@ h2 em{font-style:italic;font-weight:400}
 .btn.solid{background:var(--ink);color:var(--paper)}
 .btn.quiet{border-color:var(--rule);color:var(--ink-2)}
 
-/* the contact sheet — hairline gaps, like a photographer's proof */
-.sheet{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:26px;
-  background:var(--rule);border:1px solid var(--rule);border-radius:2px;overflow:hidden}
-.sheet figure{position:relative;aspect-ratio:1;overflow:hidden;cursor:pointer;background:#E4E7DC}
-.sheet img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease)}
-.sheet figure:active img{transform:scale(.96)}
+/* the gallery — a six-column rhythm rather than a wall of squares.
+   Each frame rises into place as it enters the screen. */
+.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:28px}
+.flow figure{position:relative;overflow:hidden;border-radius:2px;cursor:pointer;
+  background:#E4E7DC;grid-column:span 6;aspect-ratio:4/3;
+  box-shadow:0 10px 24px -18px rgba(27,41,31,.8)}
+.flow img{width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform .6s var(--ease)}
+.flow figure:active img{transform:scale(.97)}
+
+/* the rhythm: wide, pair, big + narrow, band — then it repeats */
+.flow .t-half {grid-column:span 3;aspect-ratio:3/4}
+.flow .t-low  {grid-column:span 3;aspect-ratio:3/4;margin-top:26px}
+.flow .t-big  {grid-column:span 4;aspect-ratio:1/1}
+.flow .t-slim {grid-column:span 2;aspect-ratio:3/4;margin-top:22px}
+.flow .t-band {grid-column:span 6;aspect-ratio:3/2}
+
+/* resting state after the reveal */
+.flow figure{opacity:1;transform:none}
+/* continuous, tied to the scroll itself, where the browser supports it */
+@supports (animation-timeline: view()){
+  .flow figure{animation:rise linear both;
+    animation-timeline:view();animation-range:entry 4% cover 34%}
+}
+/* everywhere else: the same movement, triggered once on approach */
+@supports not (animation-timeline: view()){
+  .flow figure{opacity:0;transform:translateY(30px) scale(.95);
+    transition:opacity .75s var(--ease),transform .75s var(--ease)}
+  .flow figure.seen{opacity:1;transform:none}
+}
+@keyframes rise{
+  from{opacity:0;transform:translateY(34px) scale(.94)}
+  to{opacity:1;transform:none}
+}
 .count-note{text-align:center;font-size:11px;letter-spacing:.16em;color:var(--ink-3);
-  margin-top:14px;text-indent:.16em}
+  margin-top:20px;text-indent:.16em}
+
+@media (prefers-reduced-motion:reduce){
+  .flow figure{opacity:1!important;transform:none!important;animation:none!important}
+}
 
 .addr{text-align:center;font-size:14.5px;line-height:1.8;color:var(--ink-2);margin-top:20px}
 .dress{text-align:center;margin-top:20px}
@@ -275,27 +305,53 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
   background:rgba(248,249,244,.78);border:1px solid rgba(27,41,31,.09);
   box-shadow:0 16px 34px -16px rgba(27,41,31,.45),inset 0 1px 0 rgba(255,255,255,.75);
   transform:translateX(-50%) scale(1);transform-origin:50% 100%;
-  transition:transform .45s var(--ease),opacity .3s ease;will-change:transform}
+  transition:transform .45s var(--ease),opacity .3s ease;will-change:transform;
+  touch-action:pan-y}
 @supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .tabs{background:rgba(248,249,244,.6);
     -webkit-backdrop-filter:saturate(200%) blur(22px);backdrop-filter:saturate(200%) blur(22px)}
 }
-/* the indicator slides between labels instead of blinking on and off */
+/* the indicator — a solid lozenge of ink, lit from above.
+   Opaque on purpose: there is nothing behind a pale bar worth refracting,
+   so depth comes from the fill, the rim and the shadow instead. */
 .pill{position:absolute;top:5px;bottom:5px;left:0;width:0;border-radius:999px;
-  background:var(--leaf);box-shadow:0 6px 14px -6px rgba(46,81,64,.8);
-  transform:translate3d(0,0,0);opacity:0;pointer-events:none;
-  transition:transform .5s var(--spring),width .5s var(--spring),opacity .3s ease}
+  pointer-events:none;opacity:0;transform-origin:50% 50%;
+  background:linear-gradient(180deg,#3C6752 0%,#325847 46%,#284638 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22),          /* the rim catching the light */
+    inset 0 -1px 0 rgba(0,0,0,.22),
+    inset 0 0 0 .5px rgba(15,32,24,.6),
+    0 1px 2px rgba(24,40,31,.34),                 /* contact shadow, tight */
+    0 6px 14px -4px rgba(24,40,31,.42);           /* ambient, soft */
+  transition:transform .52s var(--spring),width .52s var(--spring),
+             opacity .3s ease,box-shadow .28s ease}
+/* a single soft highlight across the top third — how a curved solid reads */
+.pill::before{content:"";position:absolute;left:6%;right:6%;top:1px;height:42%;
+  border-radius:999px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,0));
+  filter:blur(.3px)}
 .pill.lit{opacity:1}
+/* held: lifts off the bar, shadow spreads, rim brightens */
+.pill.held{transition:none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.3),
+    inset 0 -1px 0 rgba(0,0,0,.26),
+    inset 0 0 0 .5px rgba(15,32,24,.65),
+    0 2px 4px rgba(24,40,31,.3),
+    0 12px 24px -6px rgba(24,40,31,.5)}
+.tabs.dragging .tab{transition:color .15s ease}
+.tabs.dragging .tab:active{transform:none}
+
 .tab{position:relative;z-index:1;flex:1;min-width:0;background:none;border:none;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
   height:54px;padding:0 1px;
   font-size:8.5px;font-weight:500;letter-spacing:.07em;text-indent:.07em;color:var(--ink-2);
   transition:color .35s ease,transform .3s var(--spring)}
-.tab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;
+.tab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.85;
   stroke-linecap:round;stroke-linejoin:round;transition:transform .4s var(--spring)}
 .tab .solid{fill:currentColor;stroke:none}
 .tab.on svg{transform:translateY(-1px) scale(1.08)}
-.tab.on{color:#F4F7EF}
+.tab.on{color:#F3F7F0;font-weight:600}
 .tab:active{transform:scale(.9)}
 /* condenses while the page moves, settles when you stop */
 .tabs.moving{transform:translateX(-50%) scale(.94);opacity:.85}
@@ -400,10 +456,6 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
     <p class="label">WITH THE BLESSINGS OF OUR FAMILIES</p>
     <h2>You are warmly invited to our<br><em>reception dinner</em></h2>
 
-    <div class="portrait" id="portrait">
-      <img src="couple.jpg" alt="Kanesh and Anusha">
-    </div>
-
     <div class="hosts">
       <div class="host">
         <p class="rel">GROOM&rsquo;S PARENTS</p>
@@ -455,7 +507,7 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
   <section class="rv" id="photos" hidden>
     <p class="label">PHOTOGRAPHS</p>
     <h2>A year, more or less</h2>
-    <div class="sheet" id="sheet"></div>
+    <div class="flow" id="sheet"></div>
     <p class="count-note" id="sheetNote"></p>
   </section>
 
@@ -813,7 +865,10 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
     var el = $('backdrop');
     if (!el) return;
     firstThatLoads(BACKGROUND).then(function (src) {
-      if (!src) return;
+      if (!src) {
+        if (window.console) console.info('backdrop: no bg-page.jpg beside this page');
+        return;
+      }
       el.style.backgroundImage = 'url("' + src + '")';
       el.classList.add('has-art');
     });
@@ -827,7 +882,15 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
     el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
   }
 
-  var tabs = [], pill = null, activeTab = null;
+  var tabs = [], pill = null, activeTab = null, navLock = 0;
+
+  function liveTabs() {
+    return tabs.filter(function (t) { return !t.hidden; });
+  }
+
+  function paintActive(tab) {
+    tabs.forEach(function (t) { t.classList.toggle('on', t === tab); });
+  }
 
   function movePill(tab) {
     if (!pill || !tab) return;
@@ -838,18 +901,56 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
 
   function setActive(id) {
     var match = null;
-    tabs.forEach(function (t) {
-      var mine = t.getAttribute('data-go') === id;
-      t.classList.toggle('on', mine);
-      if (mine) match = t;
+    tabs.forEach(function (t) { if (t.getAttribute('data-go') === id) match = t; });
+    if (!match || match === activeTab) return;
+    activeTab = match;
+    paintActive(match);
+    movePill(match);
+  }
+
+  /* which tab is under this x, measured from the left edge of the bar */
+  function tabAt(x) {
+    var list = liveTabs();
+    if (!list.length) return null;
+    var hit = list[0];
+    list.forEach(function (t) {
+      if (x >= t.offsetLeft && x <= t.offsetLeft + t.offsetWidth) hit = t;
     });
-    if (match && match !== activeTab) { activeTab = match; movePill(match); }
+    var last = list[list.length - 1];
+    if (x < list[0].offsetLeft) hit = list[0];
+    if (x > last.offsetLeft + last.offsetWidth) hit = last;
+    return hit;
+  }
+
+  /* the thumb tracks the finger and leans into the movement — it stretches
+     along the direction of travel and thins a little, then relaxes on release */
+  var lastX = 0, lastT = 0;
+
+  function dragPillTo(x) {
+    if (!pill) return;
+    var list = liveTabs();
+    if (!list.length) return;
+    var last = list[list.length - 1];
+    var w = pill.offsetWidth;
+    var min = list[0].offsetLeft;
+    var max = last.offsetLeft + last.offsetWidth - w;
+    var left = Math.min(Math.max(x - w / 2, min), max);
+
+    var now = performance.now();
+    var speed = lastT ? Math.abs(left - lastX) / Math.max(now - lastT, 1) : 0;   // px per ms
+    lastX = left; lastT = now;
+
+    var sx = Math.min(1 + speed * 0.09, 1.13);      // stretch, capped
+    var sy = 1 - (sx - 1) * 0.55;                   // volume roughly preserved
+    pill.style.transform = 'translate3d(' + left + 'px,-1px,0) scale(' + sx.toFixed(3) +
+                           ',' + sy.toFixed(3) + ')';
   }
 
   function initNav() {
+    // anything else on the page that carries data-go still works as a link
     document.addEventListener('click', function (e) {
       var trigger = e.target.closest ? e.target.closest('[data-go]') : null;
-      if (!trigger) return;
+      if (!trigger || trigger.classList.contains('tab')) return;
       e.preventDefault();
       goTo(trigger.getAttribute('data-go'));
     });
@@ -859,7 +960,74 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
     tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
     if (!bar || !tabs.length) return;
 
-    // the bar draws in when the page moves and settles when it stops
+    /* ── drag to choose, exactly like a segmented control ── */
+    var dragging = false, pointer = null;
+
+    function begin(e) {
+      var list = liveTabs();
+      if (!list.length) return;
+      dragging = true;
+      pointer = e.pointerId;
+      if (bar.setPointerCapture) { try { bar.setPointerCapture(pointer); } catch (err) {} }
+      bar.classList.add('dragging');
+      if (pill) pill.classList.add('held');       // kills the transition: 1:1 with the finger
+      lastX = 0; lastT = 0;
+      stopDrift();
+      track(e);
+    }
+
+    function track(e) {
+      if (!dragging) return;
+      var x = e.clientX - bar.getBoundingClientRect().left;
+      dragPillTo(x);
+      var over = tabAt(x);
+      if (over) paintActive(over);                // the label under your finger lights up
+    }
+
+    function finish(e) {
+      if (!dragging) return;
+      dragging = false;
+      bar.classList.remove('dragging');
+      if (pill) pill.classList.remove('held');    // the spring comes back for the snap
+      if (bar.releasePointerCapture && pointer !== null) {
+        try { bar.releasePointerCapture(pointer); } catch (err) {}
+      }
+      pointer = null;
+
+      var x = e.clientX - bar.getBoundingClientRect().left;
+      var target = tabAt(x);
+      if (!target) return;
+      activeTab = target;
+      paintActive(target);
+      movePill(target);                           // snaps home from wherever you let go
+      navLock = Date.now() + 900;                 // don't let the observer argue mid-scroll
+      goTo(target.getAttribute('data-go'));
+    }
+
+    if (window.PointerEvent) {
+      bar.addEventListener('pointerdown', begin);
+      bar.addEventListener('pointermove', track);
+      bar.addEventListener('pointerup', finish);
+      bar.addEventListener('pointercancel', function () {
+        dragging = false;
+        bar.classList.remove('dragging');
+        if (pill) pill.classList.remove('held');
+        if (activeTab) movePill(activeTab);       // put it back where it was
+      });
+    } else {
+      // no pointer events: plain taps still work
+      bar.addEventListener('click', function (e) {
+        var t = e.target.closest ? e.target.closest('.tab') : null;
+        if (!t) return;
+        activeTab = t;
+        paintActive(t);
+        movePill(t);
+        navLock = Date.now() + 900;
+        goTo(t.getAttribute('data-go'));
+      });
+    }
+
+    // the bar draws in while the page moves, settles when it stops
     var settle;
     window.addEventListener('scroll', function () {
       bar.classList.add('moving');
@@ -867,7 +1035,6 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
       settle = setTimeout(function () { bar.classList.remove('moving'); }, 320);
     }, { passive: true });
 
-    // keep the indicator honest through rotation and font loading
     var reflow = function () { if (activeTab) movePill(activeTab); };
     window.addEventListener('resize', reflow);
     window.addEventListener('orientationchange', reflow);
@@ -876,6 +1043,7 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
     if (!('IntersectionObserver' in window)) return;
 
     var spy = new IntersectionObserver(function (entries) {
+      if (dragging || Date.now() < navLock) return;
       entries.forEach(function (e) {
         if (e.isIntersecting) setActive(e.target.id);
       });
@@ -959,17 +1127,6 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
     }
   }
 
-  /* ─── portrait ─────────────────────────────────────────────────── */
-  function initPortrait() {
-    var wrap = $('portrait');
-    if (!wrap) return;
-    var img = wrap.querySelector('img');
-    if (!img) return;
-    on(img, 'error', function () {
-      if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
-    });
-  }
-
   /* ─── gallery: contact sheet, then a full-screen pager ─────────── */
   var shots = [], pagerBuilt = false;
 
@@ -983,11 +1140,25 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
       shots = results.filter(Boolean);
       if (!shots.length) return;                 // no photos: the section stays hidden
 
+      var RHYTHM = ['', 't-half', 't-low', 't-big', 't-slim', 't-band'];
       sheet.innerHTML = shots.map(function (src, i) {
-        return '<figure data-i="' + i + '"><img src="' + src +
+        var shape = RHYTHM[i % RHYTHM.length];
+        return '<figure class="' + shape + '" data-i="' + i + '"><img src="' + src +
                '" alt="Photograph ' + (i + 1) + '" loading="lazy" decoding="async"></figure>';
       }).join('');
-      if (note) note.textContent = 'TAP ANY FRAME \u00B7 ' + shots.length + ' PHOTOGRAPHS';
+      if (note) note.textContent = 'TAP ANY PHOTOGRAPH \u00B7 ' + shots.length + ' IN ALL';
+
+      // fallback reveal for browsers without scroll-driven animation
+      if (!CSS.supports('animation-timeline: view()') && 'IntersectionObserver' in window) {
+        var frames = new IntersectionObserver(function (entries, self) {
+          entries.forEach(function (e) {
+            if (!e.isIntersecting) return;
+            e.target.classList.add('seen');
+            self.unobserve(e.target);
+          });
+        }, { rootMargin: '0px 0px -8% 0px' });
+        Array.prototype.forEach.call(sheet.children, function (f) { frames.observe(f); });
+      }
 
       section.hidden = false;
       if (tab) { tab.hidden = false; if (activeTab) movePill(activeTab); }
@@ -1280,7 +1451,6 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
     guard('countdown', initCountdown);
     guard('calendar', initCalendar);
     guard('calendar button', initCalendarButton);
-    guard('portrait', initPortrait);
     guard('gallery', initGallery);
     guard('lightbox', initLightbox);
     guard('gifts', initGifts);
