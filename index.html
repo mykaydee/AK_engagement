@@ -129,13 +129,17 @@ main,.tabs,.music{transition:opacity .6s ease}
 
 /* ═══════════ page ═══════════ */
 main{max-width:440px;margin:0 auto;padding:0 20px calc(var(--bar) + 40px)}
+@media (min-width:600px){ main{max-width:520px;padding-left:26px;padding-right:26px} }
+@media (min-width:900px){ main{max-width:580px} }
 section{padding:46px 0;scroll-margin-top:10px}
 section + section,.foot{border-top:1px solid var(--rule)}
 .label{font-size:11.5px;font-weight:500;letter-spacing:.2em;color:var(--brass);
   text-indent:.2em;text-align:center}
-h2{font-family:var(--serif);font-weight:500;font-size:25px;line-height:1.3;text-align:center;margin-top:12px}
+h2{font-family:var(--serif);font-weight:500;font-size:clamp(23px,6.4vw,29px);line-height:1.3;
+  text-align:center;margin-top:12px;text-wrap:balance}
 h2 em{font-style:italic;font-weight:400}
-.lede{font-size:15px;line-height:1.72;color:var(--ink-2);text-align:center;margin:16px auto 0;max-width:34ch}
+.lede{font-size:15px;line-height:1.72;color:var(--ink-2);text-align:center;margin:16px auto 0;
+  max-width:min(100%,46ch);text-wrap:pretty}
 
 /* reveal — transform and opacity only, so it never causes a reflow */
 .rv{opacity:0;transform:translateY(14px);
@@ -219,7 +223,8 @@ h2 em{font-style:italic;font-weight:400}
 
 @media (prefers-reduced-motion:reduce){ .ring{transition:none} }
 
-.addr{text-align:center;font-size:14.5px;line-height:1.8;color:var(--ink-2);margin-top:20px}
+.addr{text-align:center;font-size:14.5px;line-height:1.8;color:var(--ink-2);margin-top:20px;
+  max-width:min(100%,46ch);margin-left:auto;margin-right:auto;text-wrap:pretty}
 .dress{text-align:center;margin-top:20px}
 .dress .big{font-family:var(--serif);font-style:italic;font-size:27px}
 
@@ -283,7 +288,8 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
 
 .foot{text-align:center;padding:50px 0 10px}
 .foot .sig{font-family:var(--serif);font-style:italic;font-size:29px;line-height:1.2}
-.foot p{font-size:14px;color:var(--ink-2);margin-top:14px;max-width:30ch;margin-left:auto;margin-right:auto}
+.foot p{font-size:14px;color:var(--ink-2);margin-top:14px;
+  max-width:min(100%,46ch);margin-left:auto;margin-right:auto;text-wrap:pretty}
 
 /* ═══════════ bottom tab bar ═══════════ */
 .tabs{position:fixed;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));z-index:80;
@@ -615,7 +621,7 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
 
   <div class="foot">
     <p class="sig">Kanesh &amp; Anusha</p>
-    <p>This is one of those nights we&rsquo;ll talk about for years. We&rsquo;d like you in the story.</p>
+    <p>This is one of those nights we&rsquo;ll talk about for years. We hope you&rsquo;ll be part of what made it special.</p>
   </div>
 
 </main>
@@ -1229,10 +1235,12 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
   function bindRingDrag() {
     if (!stage) return;
     var startX = 0, startAngle = 0, lastX = 0, lastT = 0, moved = 0, pointer = null;
+    var pressed = null;                                    // the frame under the finger
 
     function down(e) {
       spin.dragging = true;
       moved = 0;
+      pressed = e.target && e.target.closest ? e.target.closest('.face') : null;
       pointer = e.pointerId;
       startX = lastX = e.clientX;
       startAngle = spin.angle;
@@ -1261,17 +1269,19 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
       }
       pointer = null;
       spin.vel = Math.max(Math.min(spin.vel, 6), -6);       // let it coast, within reason
-      if (moved < 7) {                                       // that was a tap, not a drag
-        var face = e.target.closest ? e.target.closest('.face') : null;
-        if (face) openPager(parseInt(face.getAttribute('data-i'), 10));
+      if (moved < 7 && pressed) {                            // that was a tap, not a drag
+        openPager(parseInt(pressed.getAttribute('data-i'), 10));
       }
+      pressed = null;
     }
 
     if (window.PointerEvent) {
       stage.addEventListener('pointerdown', down);
       stage.addEventListener('pointermove', move);
       stage.addEventListener('pointerup', up);
-      stage.addEventListener('pointercancel', function () { spin.dragging = false; });
+      stage.addEventListener('pointercancel', function () {
+        spin.dragging = false; pressed = null;
+      });
     } else {
       stage.addEventListener('click', function (e) {
         var face = e.target.closest ? e.target.closest('.face') : null;
