@@ -185,53 +185,43 @@ h2 em{font-style:italic;font-weight:400}
 .acts{display:flex;flex-direction:column;gap:9px;margin-top:24px}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .btn{display:flex;align-items:center;justify-content:center;min-height:52px;padding:14px 16px;
-  border:1px solid var(--ink);border-radius:2px;background:none;cursor:pointer;text-decoration:none;
+  border:1px solid var(--ink);border-radius:2px;background:var(--card);cursor:pointer;
+  text-decoration:none;color:var(--ink);
   font-size:11px;letter-spacing:.16em;text-indent:.16em;text-align:center;
-  transition:transform .18s var(--ease)}
+  box-shadow:0 1px 2px rgba(27,41,31,.05);
+  transition:transform .18s var(--ease),background .2s ease}
 .btn:active{transform:scale(.985)}
 .btn.solid{background:var(--ink);color:var(--paper)}
-.btn.quiet{border-color:var(--rule);color:var(--ink-2)}
+.btn.quiet{border-color:var(--rule);color:var(--ink-2);background:var(--card)}
 
-/* the gallery — a six-column rhythm rather than a wall of squares.
-   Each frame rises into place as it enters the screen. */
-.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:28px}
-.flow figure{position:relative;overflow:hidden;border-radius:2px;cursor:pointer;
-  background:#E4E7DC;grid-column:span 6;aspect-ratio:4/3;
-  box-shadow:0 10px 24px -18px rgba(27,41,31,.8)}
-.flow img{width:100%;height:100%;object-fit:cover;display:block;
-  transition:transform .6s var(--ease)}
-.flow figure:active img{transform:scale(.97)}
+/* the gallery — a carousel standing in real space.
+   Sizes are set from the viewport in script, so the ring always fits. */
+.stage{position:relative;margin-top:30px;height:var(--stage-h,360px);
+  perspective:var(--persp,1200px);perspective-origin:50% 46%;
+  touch-action:pan-y;overflow:hidden;cursor:grab}
+.stage:active{cursor:grabbing}
+/* the ring dissolves into the paper at both edges instead of being cut off */
+.stage::before,.stage::after{content:"";position:absolute;top:0;bottom:0;width:16%;z-index:3;
+  pointer-events:none}
+.stage::before{left:0;background:linear-gradient(90deg,var(--paper),transparent)}
+.stage::after{right:0;background:linear-gradient(-90deg,var(--paper),transparent)}
 
-/* the rhythm: wide, pair, big + narrow, band — then it repeats */
-.flow .t-half {grid-column:span 3;aspect-ratio:3/4}
-.flow .t-low  {grid-column:span 3;aspect-ratio:3/4;margin-top:26px}
-.flow .t-big  {grid-column:span 4;aspect-ratio:1/1}
-.flow .t-slim {grid-column:span 2;aspect-ratio:3/4;margin-top:22px}
-.flow .t-band {grid-column:span 6;aspect-ratio:3/2}
+.ring{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+.face{position:absolute;left:50%;top:50%;
+  width:var(--fw,170px);height:var(--fh,220px);
+  margin:calc(var(--fh,220px) / -2) 0 0 calc(var(--fw,170px) / -2);
+  border-radius:3px;overflow:hidden;background:#E4E7DC;cursor:pointer;
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;
+  box-shadow:0 20px 34px -24px rgba(27,41,31,.95),0 0 0 1px rgba(27,41,31,.07)}
+.face img{width:100%;height:100%;object-fit:cover;display:block}
+/* the further round the ring, the deeper the shade — depth you can read */
+.face::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:rgba(30,46,36,var(--shade,.3))}
 
-/* resting state after the reveal */
-.flow figure{opacity:1;transform:none}
-/* continuous, tied to the scroll itself, where the browser supports it */
-@supports (animation-timeline: view()){
-  .flow figure{animation:rise linear both;
-    animation-timeline:view();animation-range:entry 4% cover 34%}
-}
-/* everywhere else: the same movement, triggered once on approach */
-@supports not (animation-timeline: view()){
-  .flow figure{opacity:0;transform:translateY(30px) scale(.95);
-    transition:opacity .75s var(--ease),transform .75s var(--ease)}
-  .flow figure.seen{opacity:1;transform:none}
-}
-@keyframes rise{
-  from{opacity:0;transform:translateY(34px) scale(.94)}
-  to{opacity:1;transform:none}
-}
 .count-note{text-align:center;font-size:11px;letter-spacing:.16em;color:var(--ink-3);
-  margin-top:20px;text-indent:.16em}
+  margin-top:18px;text-indent:.16em}
 
-@media (prefers-reduced-motion:reduce){
-  .flow figure{opacity:1!important;transform:none!important;animation:none!important}
-}
+@media (prefers-reduced-motion:reduce){ .ring{transition:none} }
 
 .addr{text-align:center;font-size:14.5px;line-height:1.8;color:var(--ink-2);margin-top:20px}
 .dress{text-align:center;margin-top:20px}
@@ -507,7 +497,7 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
   <section class="rv" id="photos" hidden>
     <p class="label">PHOTOGRAPHS</p>
     <h2>A year, more or less</h2>
-    <div class="flow" id="sheet"></div>
+    <div class="stage" id="stage"><div class="ring" id="ring"></div></div>
     <p class="count-note" id="sheetNote"></p>
   </section>
 
@@ -1130,45 +1120,151 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
   /* ─── gallery: contact sheet, then a full-screen pager ─────────── */
   var shots = [], pagerBuilt = false;
 
+  var ring = null, stage = null;
+  var spin = { angle: 0, vel: 0, drift: -0.055, dragging: false, raf: 0, live: false };
+
+  function layoutRing() {
+    if (!ring || !stage || !shots.length) return;
+    var vw = Math.min(window.innerWidth, 520);
+    var fw = Math.max(120, Math.min(vw * 0.42, 190));      // face width
+    var fh = Math.round(fw * 1.3);                          // upright frames
+    var step = 360 / shots.length;
+    var radius = Math.round((fw / 2) / Math.tan(Math.PI / shots.length));
+    var persp = Math.round(radius * 2.6);                   // keeps the front face sane
+    var scale = persp / (persp - radius);
+
+    stage.style.setProperty('--fw', fw + 'px');
+    stage.style.setProperty('--fh', fh + 'px');
+    stage.style.setProperty('--persp', persp + 'px');
+    stage.style.setProperty('--stage-h', Math.round(fh * scale + 26) + 'px');
+
+    Array.prototype.forEach.call(ring.children, function (face, i) {
+      face.style.transform = 'rotateY(' + (i * step) + 'deg) translateZ(' + radius + 'px)';
+    });
+  }
+
+  function drawRing() {
+    if (!ring) return;
+    ring.style.transform = 'rotateY(' + spin.angle + 'deg)';
+    var step = 360 / Math.max(shots.length, 1);
+    Array.prototype.forEach.call(ring.children, function (face, i) {
+      // 1 when the frame faces you, 0 when it is edge-on
+      var facing = Math.cos((i * step + spin.angle) * Math.PI / 180);
+      face.style.setProperty('--shade', (0.42 - Math.max(facing, 0) * 0.42).toFixed(2));
+    });
+  }
+
+  function tick() {
+    if (!spin.live) { spin.raf = 0; return; }
+    if (!spin.dragging) {
+      spin.vel += (spin.drift - spin.vel) * 0.04;           // ease back to a slow drift
+      spin.angle += spin.vel;
+    }
+    drawRing();
+    spin.raf = requestAnimationFrame(tick);
+  }
+
+  function runRing(on) {
+    spin.live = on && !reduced;
+    if (spin.live && !spin.raf) spin.raf = requestAnimationFrame(tick);
+    if (!spin.live && spin.raf) { cancelAnimationFrame(spin.raf); spin.raf = 0; }
+  }
+
   function initGallery() {
-    var sheet = $('sheet'), section = $('photos'), tab = $('tabPhotos'), note = $('sheetNote');
-    if (!sheet || !section) return;
+    stage = $('stage'); ring = $('ring');
+    var section = $('photos'), tab = $('tabPhotos'), note = $('sheetNote');
+    if (!stage || !ring || !section) return;
 
     Promise.all(PHOTOS.map(function (src) {
       return probe(src).then(function (ok) { return ok ? src : null; });
     })).then(function (results) {
       shots = results.filter(Boolean);
-      if (!shots.length) return;                 // no photos: the section stays hidden
+      if (!shots.length) return;
 
-      var RHYTHM = ['', 't-half', 't-low', 't-big', 't-slim', 't-band'];
-      sheet.innerHTML = shots.map(function (src, i) {
-        var shape = RHYTHM[i % RHYTHM.length];
-        return '<figure class="' + shape + '" data-i="' + i + '"><img src="' + src +
+      ring.innerHTML = shots.map(function (src, i) {
+        return '<figure class="face" data-i="' + i + '"><img src="' + src +
                '" alt="Photograph ' + (i + 1) + '" loading="lazy" decoding="async"></figure>';
       }).join('');
-      if (note) note.textContent = 'TAP ANY PHOTOGRAPH \u00B7 ' + shots.length + ' IN ALL';
-
-      // fallback reveal for browsers without scroll-driven animation
-      if (!CSS.supports('animation-timeline: view()') && 'IntersectionObserver' in window) {
-        var frames = new IntersectionObserver(function (entries, self) {
-          entries.forEach(function (e) {
-            if (!e.isIntersecting) return;
-            e.target.classList.add('seen');
-            self.unobserve(e.target);
-          });
-        }, { rootMargin: '0px 0px -8% 0px' });
-        Array.prototype.forEach.call(sheet.children, function (f) { frames.observe(f); });
-      }
+      if (note) note.textContent = 'DRAG TO TURN \u00B7 TAP TO OPEN \u00B7 ' + shots.length + ' IN ALL';
 
       section.hidden = false;
       if (tab) { tab.hidden = false; if (activeTab) movePill(activeTab); }
       if (reveal) reveal.observe(section);
+
+      layoutRing();
+      drawRing();
+
+      // it only turns while you can see it — no wasted frames
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { runRing(e.isIntersecting); });
+        }, { rootMargin: '10% 0px' }).observe(stage);
+      } else {
+        runRing(true);
+      }
     });
 
-    on(sheet, 'click', function (e) {
-      var fig = e.target.closest ? e.target.closest('figure') : null;
-      if (fig) openPager(parseInt(fig.getAttribute('data-i'), 10));
+    window.addEventListener('resize', function () { layoutRing(); drawRing(); });
+    window.addEventListener('orientationchange', function () {
+      setTimeout(function () { layoutRing(); drawRing(); }, 150);
     });
+
+    bindRingDrag();
+  }
+
+  /* drag to turn it, with momentum — and a tap still opens the pager */
+  function bindRingDrag() {
+    if (!stage) return;
+    var startX = 0, startAngle = 0, lastX = 0, lastT = 0, moved = 0, pointer = null;
+
+    function down(e) {
+      spin.dragging = true;
+      moved = 0;
+      pointer = e.pointerId;
+      startX = lastX = e.clientX;
+      startAngle = spin.angle;
+      lastT = performance.now();
+      if (stage.setPointerCapture) { try { stage.setPointerCapture(pointer); } catch (err) {} }
+      stopDrift();
+      runRing(true);
+    }
+
+    function move(e) {
+      if (!spin.dragging) return;
+      var dx = e.clientX - startX;
+      moved = Math.max(moved, Math.abs(dx));
+      spin.angle = startAngle + dx * 0.42;                  // degrees per pixel
+      var now = performance.now();
+      spin.vel = (e.clientX - lastX) * 0.42 / Math.max(now - lastT, 1) * 16;   // per frame
+      lastX = e.clientX; lastT = now;
+      drawRing();
+    }
+
+    function up(e) {
+      if (!spin.dragging) return;
+      spin.dragging = false;
+      if (stage.releasePointerCapture && pointer !== null) {
+        try { stage.releasePointerCapture(pointer); } catch (err) {}
+      }
+      pointer = null;
+      spin.vel = Math.max(Math.min(spin.vel, 6), -6);       // let it coast, within reason
+      if (moved < 7) {                                       // that was a tap, not a drag
+        var face = e.target.closest ? e.target.closest('.face') : null;
+        if (face) openPager(parseInt(face.getAttribute('data-i'), 10));
+      }
+    }
+
+    if (window.PointerEvent) {
+      stage.addEventListener('pointerdown', down);
+      stage.addEventListener('pointermove', move);
+      stage.addEventListener('pointerup', up);
+      stage.addEventListener('pointercancel', function () { spin.dragging = false; });
+    } else {
+      stage.addEventListener('click', function (e) {
+        var face = e.target.closest ? e.target.closest('.face') : null;
+        if (face) openPager(parseInt(face.getAttribute('data-i'), 10));
+      });
+    }
   }
 
   /* the pager is built once, on first open, so the page load stays light */
@@ -1195,8 +1291,8 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
   function updateCounter() {
     var el = $('counter');
     if (el && shots.length) {
-      el.textContent = String(pageIndex() + 1).padStart(2, '0') + ' / ' +
-                       String(shots.length).padStart(2, '0');
+      var two = function (n) { return n < 10 ? '0' + n : String(n); };
+      el.textContent = two(pageIndex() + 1) + ' / ' + two(shots.length);
     }
   }
 
