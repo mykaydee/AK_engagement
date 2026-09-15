@@ -194,23 +194,25 @@ h2 em{font-style:italic;font-weight:400}
 .btn.solid{background:var(--ink);color:var(--paper)}
 .btn.quiet{border-color:var(--rule);color:var(--ink-2);background:var(--card)}
 
-/* the gallery — a carousel standing in real space.
-   Sizes are set from the viewport in script, so the ring always fits. */
-.stage{position:relative;margin-top:30px;height:var(--stage-h,360px);
-  perspective:var(--persp,1200px);perspective-origin:50% 50%;
+/* the gallery — a see-through cylinder of photographs.
+   Full-bleed, so the sides of the ring stay on screen instead of being
+   clipped by the text column. Sizes come from the viewport, in script. */
+.stage{position:relative;margin:30px 0 0;margin-left:calc(50% - 50vw);width:100vw;
+  height:var(--stage-h,340px);
+  perspective:var(--persp,900px);perspective-origin:50% 50%;
   touch-action:pan-y;overflow:hidden;cursor:grab}
 .stage:active{cursor:grabbing}
+
 .ring{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
 .face{position:absolute;left:50%;top:50%;
-  width:var(--fw,170px);height:var(--fh,220px);
-  margin:calc(var(--fh,220px) / -2) 0 0 calc(var(--fw,170px) / -2);
+  width:var(--fw,150px);height:var(--fh,195px);
+  margin:calc(var(--fh,195px) / -2) 0 0 calc(var(--fw,150px) / -2);
   border-radius:3px;overflow:hidden;background:#E4E7DC;cursor:pointer;
-  -webkit-backface-visibility:hidden;backface-visibility:hidden;
-  box-shadow:0 10px 20px -14px rgba(27,41,31,.55)}
+  box-shadow:0 10px 20px -14px rgba(27,41,31,.5)}
 .face img{width:100%;height:100%;object-fit:cover;display:block}
-/* the further round the ring, the deeper the shade — depth you can read */
+/* frames on the far side stay visible, just further away */
 .face::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:rgba(30,46,36,var(--shade,.3))}
+  background:rgba(232,236,228,var(--haze,0))}
 
 .count-note{text-align:center;font-size:11px;letter-spacing:.16em;color:var(--ink-3);
   margin-top:18px;text-indent:.16em}
@@ -1119,33 +1121,26 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
   /* ─── gallery: contact sheet, then a full-screen pager ─────────── */
   var shots = [], pagerBuilt = false;
 
-  var ring = null, stage = null;
+  var ring = null, stage = null, faces = [];
   var spin = { angle: 0, vel: 0, drift: -0.055, dragging: false, raf: 0, live: false };
 
   function layoutRing() {
-    if (!ring || !stage || !shots.length) return;
-    var n = shots.length;
-    var vw = Math.min(window.innerWidth, 520);
-    var fw = Math.max(120, Math.min(vw * 0.42, 190));       // face width
-    var fh = Math.round(fw * 1.3);                           // upright frames
+    if (!ring || !stage || !faces.length) return;
+    var n = faces.length;
+    var vw = Math.min(window.innerWidth, 560);
+    var fw = Math.round(Math.max(118, Math.min(vw * 0.36, 200)));
+    var fh = Math.round(fw * 1.3);
     var step = 360 / n;
 
-    /* The old radius came straight from the face width, which makes the chord
-       between neighbours shorter than the faces themselves — they intersect,
-       and six photos fold into a box. Give each face a slice wider than it is,
-       and hold a floor so small sets still read as a ring. */
-    var slice = fw * 1.3;
-    var radius = Math.round(Math.max(
-      (slice / 2) / Math.tan(Math.PI / n),
-      fw * 1.5
-    ));
-    var persp = Math.round(radius * 3.2);                    // gentler projection
-    var scale = persp / (persp - radius);                    // ≈1.45
+    // a slice a quarter wider than the frame keeps daylight between neighbours
+    var radius = Math.round((fw * 1.25 / 2) / Math.tan(Math.PI / n));
+    var persp  = Math.round(radius * 2.8);
+    var scale  = persp / (persp - radius);          // ≈1.56 at the front
 
     stage.style.setProperty('--fw', fw + 'px');
     stage.style.setProperty('--fh', fh + 'px');
     stage.style.setProperty('--persp', persp + 'px');
-    stage.style.setProperty('--stage-h', Math.round(fh * scale + 48) + 'px');
+    stage.style.setProperty('--stage-h', Math.round(fh * scale + 54) + 'px');
 
     Array.prototype.forEach.call(ring.children, function (face, i) {
       face.style.transform = 'rotateY(' + (i * step) + 'deg) translateZ(' + radius + 'px)';
@@ -1155,11 +1150,13 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
   function drawRing() {
     if (!ring) return;
     ring.style.transform = 'rotateY(' + spin.angle + 'deg)';
-    var step = 360 / Math.max(shots.length, 1);
+    var step = 360 / Math.max(faces.length, 1);
     Array.prototype.forEach.call(ring.children, function (face, i) {
-      // 1 when the frame faces you, 0 when it is edge-on
-      var facing = Math.cos((i * step + spin.angle) * Math.PI / 180);
-      face.style.setProperty('--shade', (0.42 - Math.max(facing, 0) * 0.42).toFixed(2));
+      var facing = Math.cos((i * step + spin.angle) * Math.PI / 180);  // +1 near, -1 far
+      var depth = (1 - facing) / 2;                   // 0 at the front, 1 at the back
+      face.style.setProperty('--haze', (depth * 0.62).toFixed(2));
+      face.style.opacity = (1 - depth * 0.55).toFixed(2);
+      face.style.zIndex = Math.round(facing * 100);
     });
   }
 
@@ -1190,9 +1187,16 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
       shots = results.filter(Boolean);
       if (!shots.length) return;
 
-      ring.innerHTML = shots.map(function (src, i) {
-        return '<figure class="face" data-i="' + i + '"><img src="' + src +
-               '" alt="Photograph ' + (i + 1) + '" loading="lazy" decoding="async"></figure>';
+      // fewer than nine cannot read as a ring, so the set repeats around it —
+      // a tap still opens the original photograph
+      var loops = Math.max(1, Math.ceil(9 / shots.length));
+      faces = [];
+      for (var l = 0; l < loops; l++) {
+        for (var k = 0; k < shots.length; k++) faces.push(k);
+      }
+      ring.innerHTML = faces.map(function (idx) {
+        return '<figure class="face" data-i="' + idx + '"><img src="' + shots[idx] +
+               '" alt="Photograph ' + (idx + 1) + '" loading="lazy" decoding="async"></figure>';
       }).join('');
       if (note) note.textContent = 'DRAG TO TURN \u00B7 TAP TO OPEN \u00B7 ' + shots.length + ' IN ALL';
 
