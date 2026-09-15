@@ -1162,7 +1162,6 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
       var depth = (1 - facing) / 2;                   // 0 at the front, 1 at the back
       face.style.setProperty('--haze', (depth * 0.62).toFixed(2));
       face.style.opacity = (1 - depth * 0.55).toFixed(2);
-      face.style.zIndex = Math.round(facing * 100);
     });
   }
 
@@ -1200,10 +1199,20 @@ input::placeholder,textarea::placeholder{color:#A9B2A9}
       for (var l = 0; l < loops; l++) {
         for (var k = 0; k < shots.length; k++) faces.push(k);
       }
-      ring.innerHTML = faces.map(function (idx) {
-        return '<figure class="face" data-i="' + idx + '"><img src="' + shots[idx] +
-               '" alt="Photograph ' + (idx + 1) + '" loading="lazy" decoding="async"></figure>';
-      }).join('');
+      // the ring shows frames about 200px wide, so it will use thumb1.jpg,
+      // thumb2.jpg … if they exist — far less memory than the full pictures.
+      // The pager always uses the originals.
+      Promise.all(shots.map(function (src) {
+        var small = src.replace('photo', 'thumb');
+        return probe(small).then(function (ok) { return ok ? small : src; });
+      })).then(function (thumbs) {
+        ring.innerHTML = faces.map(function (idx) {
+          return '<figure class="face" data-i="' + idx + '"><img src="' + thumbs[idx] +
+                 '" alt="Photograph ' + (idx + 1) + '" decoding="async"></figure>';
+        }).join('');
+        layoutRing();
+        drawRing();
+      });
       if (note) note.textContent = 'DRAG TO TURN \u00B7 TAP TO OPEN \u00B7 ' + shots.length + ' IN ALL';
 
       section.hidden = false;
